@@ -17,7 +17,7 @@
     body { background-color: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; max-width: 1250px; margin: 0 auto; }
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--card-border); flex-wrap: wrap; gap: 12px; }
     h1 { font-size: 1.35rem; color: var(--primary); }
-    .gamify-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .gamify-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .gamify-stat { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
     .gamify-icon { font-size: 1.8rem; line-height: 1; }
     .gamify-info { flex: 1; }
@@ -49,7 +49,7 @@
     .section-title { font-size: 0.9rem; font-weight: 700; color: var(--accent); text-transform: uppercase; }
     .exercise-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
     .exercise-item { background: rgba(30, 27, 75, 0.6); padding: 9px 12px; border-radius: 6px; border-left: 3px solid var(--primary); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
-    .exercise-item .meta { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 2px; }
+    .exercise-item .meta { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 4px; }
     .item-actions button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; margin-left: 6px; font-size: 0.85rem; }
     .item-actions button:hover { color: var(--text); }
     .item-actions button.del:hover { color: var(--danger); }
@@ -64,8 +64,8 @@
     .btn-danger { background: var(--danger); color: #fff; }
     .btn-sm { padding: 4px 8px; font-size: 0.8rem; }
     .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
-    .achievement-card { background: rgba(30, 27, 75, 0.6); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; text-align: center; opacity: 0.4; transition: all 0.2s; }
-    .achievement-card.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(251, 191, 36, 0.15); }
+    .achievement-card { background: rgba(30, 27, 75, 0.6); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; text-align: center; opacity: 0.3; transition: all 0.2s; filter: grayscale(80%); }
+    .achievement-card.unlocked { opacity: 1; border-color: var(--primary); filter: grayscale(0%); box-shadow: 0 0 10px rgba(192, 132, 252, 0.15); }
     .achievement-card .icon { font-size: 1.6rem; margin-bottom: 4px; }
     .achievement-card .title { font-size: 0.75rem; font-weight: 700; color: #fff; display: block; }
     .achievement-card .desc { font-size: 0.65rem; color: var(--text-muted); }
@@ -115,6 +115,13 @@
       <div class="gamify-info">
         <div class="gamify-label">Streak Shields</div>
         <div class="gamify-val" id="hudShields">0 / 3</div>
+      </div>
+    </div>
+    <div class="gamify-stat">
+      <div class="gamify-icon" style="color: var(--success);">🎯</div>
+      <div class="gamify-info">
+        <div class="gamify-label">Effort Compliance</div>
+        <div class="gamify-val" id="hudCompliance">0%</div>
       </div>
     </div>
     <div class="gamify-stat">
@@ -214,9 +221,9 @@
     <div class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h2>Google Drive Sync</h2>
-        <button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset Progress</button>
+        <button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset Progress (Soft)</button>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Authenticate to sync data to Drive. <strong>Catalog</strong> syncs your exercises & blueprints. <strong>Progress</strong> syncs your weekly generated plan & streak.</p>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Authenticate to sync data to Drive. <strong>Catalog</strong> syncs your exercises & blueprints. <strong>Progress</strong> syncs your weekly generated plan & gamification.</p>
       
       <div class="form-group" style="margin-bottom: 16px;">
         <label>Google OAuth Client ID</label>
@@ -290,6 +297,11 @@
           <div class="form-group"><label>Work (s)</label><input type="number" id="modalIntWork" placeholder="e.g. 60" /></div>
           <div class="form-group"><label>Rest (s)</label><input type="number" id="modalIntRest" placeholder="e.g. 60" /></div>
         </div>
+        
+        <div class="form-group" style="margin-top: 8px; border-top: 1px solid var(--card-border); padding-top: 8px;">
+          <label>Target Effort</label>
+          <input type="text" id="modalEffort" placeholder="e.g., Light, Moderate, Hard" required />
+        </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
           <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -308,13 +320,30 @@
     ];
 
     const ACHIEVEMENTS_DATA = [
-      { id: "first_log", icon: "🚀", title: "First Step", desc: "Log your first session" },
-      { id: "snack_master", icon: "🍏", title: "Fitness Snacker", desc: "Log a quick daily snack" },
-      { id: "streak_7", icon: "🔥", title: "Iron Habit", desc: "Achieve a 7-day streak" },
-      { id: "couples_bronze", icon: "🥉", title: "Dynamic Duo (Bronze)", desc: "1 Couples Workout" },
-      { id: "couples_silver", icon: "🥈", title: "Dynamic Duo (Silver)", desc: "5 Couples Workouts" },
-      { id: "couples_gold", icon: "🥇", title: "Dynamic Duo (Gold)", desc: "10 Couples Workouts" },
-      { id: "couples_plat", icon: "💎", title: "Dynamic Duo (Plat)", desc: "25 Couples Workouts" }
+      { id: "log_bronze", icon: "🥉", title: "Starter Log", desc: "1 Session Logged" },
+      { id: "log_silver", icon: "🥈", title: "Regular", desc: "10 Sessions Logged" },
+      { id: "log_gold", icon: "🥇", title: "Dedicated", desc: "25 Sessions Logged" },
+      { id: "log_plat", icon: "💎", title: "Unstoppable", desc: "50 Sessions Logged" },
+
+      { id: "snack_bronze", icon: "🍏", title: "Snacker (Br)", desc: "1 Snack Logged" },
+      { id: "snack_silver", icon: "🍎", title: "Snacker (Sv)", desc: "10 Snacks Logged" },
+      { id: "snack_gold", icon: "🥞", title: "Snacker (Au)", desc: "25 Snacks Logged" },
+      { id: "snack_plat", icon: "🍱", title: "Snacker (Pt)", desc: "50 Snacks Logged" },
+
+      { id: "streak_bronze", icon: "🔥", title: "Iron Habit", desc: "7-Day Streak" },
+      { id: "streak_silver", icon: "🔥", title: "Steel Habit", desc: "14-Day Streak" },
+      { id: "streak_gold", icon: "🔥", title: "Titanium Habit", desc: "30-Day Streak" },
+      { id: "streak_plat", icon: "🔥", title: "Diamond Habit", desc: "60-Day Streak" },
+
+      { id: "couples_bronze", icon: "🥉", title: "Dynamic Duo", desc: "1 Couples Workout" },
+      { id: "couples_silver", icon: "🥈", title: "Dynamic Duo", desc: "5 Couples Workouts" },
+      { id: "couples_gold", icon: "🥇", title: "Dynamic Duo", desc: "10 Couples Workouts" },
+      { id: "couples_plat", icon: "💎", title: "Dynamic Duo", desc: "25 Couples Workouts" },
+
+      { id: "comp_bronze", icon: "🎯", title: "Targeted (Br)", desc: ">70% Compliance" },
+      { id: "comp_silver", icon: "🎯", title: "Targeted (Sv)", desc: ">80% Compliance" },
+      { id: "comp_gold", icon: "🎯", title: "Targeted (Au)", desc: ">90% Compliance" },
+      { id: "comp_plat", icon: "🎯", title: "Perfect Form", desc: "100% Compliance (10+ logs)" }
     ];
 
     let appData = JSON.parse(localStorage.getItem("health_tracker_app_data"));
@@ -330,9 +359,34 @@
       currentCycle: metaState.cycle, currentWeek: metaState.week, activeWeeksInCycle: metaState.activeWeeks,
       currentDay: DAYS[new Date().getDay()].id,
       logs: JSON.parse(localStorage.getItem("health_tracker_logs")) || {},
-      gamify: JSON.parse(localStorage.getItem("health_tracker_gamify")) || { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [] },
+      gamify: JSON.parse(localStorage.getItem("health_tracker_gamify")) || {},
       generatedPlans: JSON.parse(localStorage.getItem("health_tracker_generated_plans")) || {}
     };
+
+    // Safe Gamify Initialization
+    state.gamify.xp = state.gamify.xp || 0;
+    state.gamify.streak = state.gamify.streak || 0;
+    state.gamify.shields = state.gamify.shields !== undefined ? state.gamify.shields : 2;
+    state.gamify.unlocked = state.gamify.unlocked || [];
+    state.gamify.couplesCount = state.gamify.couplesCount || 0;
+    state.gamify.totalSessionsCount = state.gamify.totalSessionsCount || 0;
+    state.gamify.compliantSessionsCount = state.gamify.compliantSessionsCount || 0;
+    state.gamify.snackCount = state.gamify.snackCount || 0;
+
+    // --- EFFORT PARSING LOGIC ---
+    function parseEffort(effortStr) {
+        if (!effortStr) return 2; // Default Moderate
+        const e = effortStr.toLowerCase();
+        if (e.includes("easy") || e.includes("light") || e.includes("green")) return 1;
+        if (e.includes("hard") || e.includes("max") || e.includes("red")) return 3;
+        return 2;
+    }
+
+    function getEffortStyle(val) {
+        if (val === 1) return 'background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #4ade80; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;';
+        if (val === 3) return 'background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #fca5a5; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;';
+        return 'background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid #fde047; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;';
+    }
 
     function init() {
       document.getElementById("gcpClientId").value = localStorage.getItem("health_gdrive_client_id") || "";
@@ -345,11 +399,10 @@
       document.getElementById("jsonArea").value = JSON.stringify(appData, null, 2);
     }
 
-    // --- SYSTEM MANAGEMENT FUNCTIONS ---
     function factoryReset() {
       if (confirm("⚠️ WARNING: This will permanently delete your logs, XP, and streaks to let you start fresh. Your weekly plans and blueprints will remain perfectly intact. Proceed?")) {
         state.logs = {};
-        state.gamify = { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [] };
+        state.gamify = { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [], totalSessionsCount: 0, compliantSessionsCount: 0, snackCount: 0 };
         saveState();
         init();
         alert("Progress reset. Your training plan remains intact.");
@@ -367,7 +420,6 @@
         alert("Current week successfully re-rolled!");
       }
     }
-    // -----------------------------------
 
     function ensurePlanExists(cycle, week) {
       const key = `c${cycle}_w${week}`;
@@ -455,6 +507,10 @@
       document.getElementById("hudStreak").innerText = `${g.streak} Day${g.streak === 1 ? '' : 's'}`;
       document.getElementById("hudShields").innerText = `${g.shields} / 3`;
       document.getElementById("hudCouples").innerText = `${g.couplesCount || 0} Logged`;
+      
+      let comp = g.totalSessionsCount > 0 ? Math.round((g.compliantSessionsCount / g.totalSessionsCount) * 100) : 0;
+      document.getElementById("hudCompliance").innerText = `${comp}%`;
+
       const level = Math.floor(g.xp / 400) + 1;
       document.getElementById("hudLevel").innerText = `Level ${level}`;
       document.getElementById("hudXp").innerText = `${g.xp} XP`;
@@ -497,12 +553,18 @@
         hasScheduled = true;
         if (key === 'aerobic') hasAerobic = true;
         
+        let targetSum = 0; let targetCount = 0;
+        dayData[key].forEach(ex => { targetSum += parseEffort(ex.effort); targetCount++; });
+        let sessionTargetNum = targetCount > 0 ? Math.round(targetSum / targetCount) : 2;
+        let targetWord = sessionTargetNum === 1 ? '🟢 Light' : (sessionTargetNum === 3 ? '🔴 Hard' : '🟡 Moderate');
+
         const statusVal = statuses[key] || "completed";
         const colorVal = colors[key] || "";
         
         container.innerHTML += `
           <div class="form-group" style="border-left: 2px solid var(--primary); padding-left: 10px; margin-bottom: 12px; background: rgba(30, 27, 75, 0.4); padding: 10px; border-radius: 6px;">
-            <label style="color: #fff; font-size: 0.95rem; margin-bottom: 6px;">${label}</label>
+            <label style="color: #fff; font-size: 0.95rem; margin-bottom: 2px;">${label}</label>
+            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Target: ${targetWord}</span>
             <div style="display: flex; gap: 10px; margin-bottom: 8px;">
                 <select id="status_${key}" style="flex: 1; border-color: var(--primary);">
                   <option value="completed" ${statusVal==='completed'?'selected':''}>Completed</option>
@@ -564,13 +626,18 @@
       document.getElementById(`${type}List`).innerHTML = list.map((item, index) => {
         if (!item.exerciseId || !catalog[item.exerciseId]) return `<li class="exercise-item"><div><strong>No matching exercise found</strong></div></li>`;
         const entry = catalog[item.exerciseId];
+        
+        let effortVal = parseEffort(item.effort);
+        let effortHtml = `<span class="meta" style="${getEffortStyle(effortVal)} display: inline-block; margin-top: 4px;">Target: ${item.effort || 'Moderate'}</span>`;
+
         return `
           <li class="exercise-item">
             <div>
-              <strong>${entry.name}</strong>
-              <span class="meta" style="color:var(--accent); font-weight:600;">${item.category.toUpperCase().replace("_"," ")}</span>
-              <span class="meta" style="color: #fff;">${formatPrescription(item.prescription)}</span>
-              ${entry.equipment && entry.equipment !== 'None' ? `<span class="meta">• ${entry.equipment}</span>` : ''}
+              <strong style="font-size: 1rem;">${entry.name}</strong>
+              <span class="meta" style="color:var(--accent); font-weight:600; display:block;">${item.category.toUpperCase().replace("_"," ")}</span>
+              <span class="meta" style="color: #fff; margin-bottom: 2px;">${formatPrescription(item.prescription)}</span>
+              ${effortHtml}
+              ${entry.equipment && entry.equipment !== 'None' ? `<span class="meta" style="margin-top:4px;">• ${entry.equipment}</span>` : ''}
               ${entry.notes ? `<span class="meta" style="font-style:italic;">${entry.notes}</span>` : ''}
             </div>
             <div class="item-actions">
@@ -586,6 +653,7 @@
       e.preventDefault();
       const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
       const logKey = `${planKey}_${state.currentDay}`;
+      const dayData = state.generatedPlans[planKey].days[state.currentDay];
       const notes = document.getElementById("logNotes").value;
       const distance = document.getElementById("logDistance").value;
       const isCouples = document.getElementById("logCouples").checked;
@@ -593,6 +661,9 @@
       const sessionStatus = {};
       const sessionColors = {};
       let scheduledCount = 0; let completedCount = 0;
+      let complianceMatches = 0;
+
+      const isNewLog = !state.logs[logKey];
 
       ['resistance', 'aerobic', 'snack'].forEach(key => {
         const el = document.getElementById(`status_${key}`);
@@ -602,14 +673,31 @@
           scheduledCount++;
           if (status === 'completed' || status === 'modified') {
             completedCount++;
-            sessionColors[key] = document.getElementById(`color_val_${key}`).value || 'green';
+            const loggedColor = document.getElementById(`color_val_${key}`).value || 'green';
+            sessionColors[key] = loggedColor;
+
+            if (isNewLog) {
+                state.gamify.totalSessionsCount++;
+                if (key === 'snack') state.gamify.snackCount++;
+
+                let targetSum = 0; let targetCount = 0;
+                if (dayData[key]) {
+                    dayData[key].forEach(ex => { targetSum += parseEffort(ex.effort); targetCount++; });
+                }
+                let sessionTargetNum = targetCount > 0 ? Math.round(targetSum / targetCount) : 2;
+                let loggedVal = loggedColor === 'green' ? 1 : (loggedColor === 'red' ? 3 : 2);
+
+                if (loggedVal === sessionTargetNum) {
+                    state.gamify.compliantSessionsCount++;
+                    complianceMatches++;
+                }
+            }
           }
         }
       });
 
       const isRestDay = (scheduledCount === 0);
       const completionRatio = isRestDay ? 1.0 : (completedCount / scheduledCount);
-      const isNewLog = !state.logs[logKey];
       
       if (completionRatio === 0 && !isRestDay) {
         if (state.gamify.shields > 0) {
@@ -624,11 +712,8 @@
       } else {
         if (isNewLog) {
           state.gamify.streak += 1;
-          unlockBadge("first_log");
-          if (state.gamify.streak >= 7) unlockBadge("streak_7");
-
-          // SHIELD RECOVERY LOGIC
-          if (state.gamify.streak % 7 === 0) {
+          
+          if (state.gamify.streak > 0 && state.gamify.streak % 7 === 0) {
             if (state.gamify.shields < 3) {
               state.gamify.shields += 1;
               alert("🛡️ 7-Day Streak! You earned a Streak Shield!");
@@ -640,14 +725,21 @@
           let earnedXp = isRestDay ? 30 : Math.round(100 * completionRatio);
           if (sessionStatus.snack && sessionStatus.snack !== 'missed') {
              earnedXp += 25; 
-             unlockBadge("snack_master");
           }
           if (isCouples) {
              earnedXp += 50;
-             state.gamify.couplesCount = (state.gamify.couplesCount || 0) + 1;
-             checkCouplesBadges();
+             state.gamify.couplesCount++;
           }
+          if (complianceMatches > 0) {
+             earnedXp += (complianceMatches * 15);
+          }
+          
           state.gamify.xp += earnedXp;
+          checkAllBadges();
+
+          if (complianceMatches > 0) {
+              alert(`🎯 Perfect compliance! +${complianceMatches * 15} XP Bonus!`);
+          }
         }
         sessionStatus.overall = "completed";
       }
@@ -656,12 +748,36 @@
       saveState(); init();
     }
 
-    function checkCouplesBadges() {
-       const count = state.gamify.couplesCount;
-       if (count >= 1) unlockBadge("couples_bronze");
-       if (count >= 5) unlockBadge("couples_silver");
-       if (count >= 10) unlockBadge("couples_gold");
-       if (count >= 25) unlockBadge("couples_plat");
+    function checkAllBadges() {
+       const g = state.gamify;
+       
+       if (g.totalSessionsCount >= 1) unlockBadge("log_bronze");
+       if (g.totalSessionsCount >= 10) unlockBadge("log_silver");
+       if (g.totalSessionsCount >= 25) unlockBadge("log_gold");
+       if (g.totalSessionsCount >= 50) unlockBadge("log_plat");
+
+       if (g.snackCount >= 1) unlockBadge("snack_bronze");
+       if (g.snackCount >= 10) unlockBadge("snack_silver");
+       if (g.snackCount >= 25) unlockBadge("snack_gold");
+       if (g.snackCount >= 50) unlockBadge("snack_plat");
+
+       if (g.streak >= 7) unlockBadge("streak_bronze");
+       if (g.streak >= 14) unlockBadge("streak_silver");
+       if (g.streak >= 30) unlockBadge("streak_gold");
+       if (g.streak >= 60) unlockBadge("streak_plat");
+
+       if (g.couplesCount >= 1) unlockBadge("couples_bronze");
+       if (g.couplesCount >= 5) unlockBadge("couples_silver");
+       if (g.couplesCount >= 10) unlockBadge("couples_gold");
+       if (g.couplesCount >= 25) unlockBadge("couples_plat");
+
+       if (g.totalSessionsCount >= 5) {
+           let comp = (g.compliantSessionsCount / g.totalSessionsCount) * 100;
+           if (comp >= 70) unlockBadge("comp_bronze");
+           if (comp >= 80) unlockBadge("comp_silver");
+           if (comp >= 90) unlockBadge("comp_gold");
+           if (comp === 100 && g.totalSessionsCount >= 10) unlockBadge("comp_plat");
+       }
     }
 
     function advanceWeekWorkflow() {
@@ -693,7 +809,6 @@
       localStorage.setItem("health_tracker_meta", JSON.stringify({ cycle: state.currentCycle, week: state.currentWeek, activeWeeks: state.activeWeeksInCycle }));
     }
 
-    /* Modal / Category Extractor Editor */
     window.populateCategoryDropdown = function(type, selectedCategory = "") {
       const select = document.getElementById("modalCategorySelect");
       select.innerHTML = "";
@@ -742,6 +857,7 @@
       document.getElementById("modalRepRest").value = "";
       document.getElementById("modalMin").value = "";
       document.getElementById("modalIntSets").value = "";
+      document.getElementById("modalEffort").value = "Moderate";
       
       populateCategoryDropdown(type);
       togglePrescriptionFields();
@@ -755,6 +871,7 @@
       document.getElementById("modalType").value = type;
       document.getElementById("modalEditIndex").value = index;
       document.getElementById("modalTitle").innerText = `Edit ${type.toUpperCase()}`;
+      document.getElementById("modalEffort").value = item.effort || "Moderate";
       
       populateCategoryDropdown(type, item.category);
       populateGroupedDropdown(item.exerciseId);
@@ -787,6 +904,7 @@
       const category = document.getElementById("modalCategorySelect").value;
       const exerciseId = document.getElementById("modalExerciseSelect").value;
       const pType = document.getElementById("modalPrescriptionType").value;
+      const effort = document.getElementById("modalEffort").value;
 
       let prescription = { type: pType };
       if (pType === 'duration') { prescription.minutes = parseInt(document.getElementById("modalMin").value) || 0; }
@@ -804,8 +922,8 @@
       const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
       const arr = state.generatedPlans[planKey].days[state.currentDay][type];
       
-      if (index === -1) arr.push({ category, exerciseId, prescription });
-      else arr[index] = { category, exerciseId, prescription };
+      if (index === -1) arr.push({ category, exerciseId, prescription, effort });
+      else arr[index] = { category, exerciseId, prescription, effort };
       
       saveState(); closeModal(); renderDayView();
     }
@@ -816,7 +934,6 @@
       saveState(); renderDayView();
     }
     
-    /* MANUAL LOAD - ONLY UPDATES CATALOG (Safe) */
     function loadDataFromClipboard() {
       try { 
         appData = JSON.parse(document.getElementById("jsonArea").value); 
@@ -826,7 +943,6 @@
       } catch(e) { alert("Invalid JSON format."); }
     }
 
-    /* GOOGLE DRIVE SYNC: SPLIT FOR CATALOG vs STATE */
     const SCOPES = 'https://www.googleapis.com/auth/drive.file';
     let tokenClient;
     let pendingAction = null;
@@ -911,7 +1027,7 @@
         } else {
             if(data.state) {
                 state.logs = data.state.logs || {};
-                state.gamify = data.state.gamify || { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [] };
+                state.gamify = data.state.gamify || { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [], totalSessionsCount: 0, compliantSessionsCount: 0, snackCount: 0 };
                 state.generatedPlans = data.state.generatedPlans || {};
                 state.currentCycle = data.state.currentCycle;
                 state.currentWeek = data.state.currentWeek;
