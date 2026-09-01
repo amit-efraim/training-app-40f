@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Master Swimmer Adaptive Training System</title>
+  <title>Health & Vitality Tracker</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
-      --bg: #0f172a; --card-bg: #1e293b; --card-border: #334155;
-      --primary: #38bdf8; --primary-hover: #0ea5e9; --accent: #a855f7;
-      --running: #34d399; --text: #f8fafc; --text-muted: #94a3b8;
-      --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+      --bg: #1e1b4b; --card-bg: #312e81; --card-border: #4338ca;
+      --primary: #c084fc; --primary-hover: #a855f7; --accent: #f472b6;
+      --running: #34d399; --text: #f8fafc; --text-muted: #cbd5e1;
+      --success: #22c55e; --warning: #eab308; --danger: #ef4444;
       --gold: #fbbf24; --fire: #f97316;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -23,19 +23,18 @@
     .gamify-info { flex: 1; }
     .gamify-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; }
     .gamify-val { font-size: 1.2rem; font-weight: 800; color: #fff; }
-    .progress-bar-outer { background: #0f172a; border-radius: 999px; height: 7px; width: 100%; margin-top: 5px; overflow: hidden; border: 1px solid var(--card-border); }
+    .progress-bar-outer { background: #1e1b4b; border-radius: 999px; height: 7px; width: 100%; margin-top: 5px; overflow: hidden; border: 1px solid var(--card-border); }
     .progress-bar-inner { background: linear-gradient(90deg, var(--primary), var(--accent)); height: 100%; width: 0%; transition: width 0.4s ease; }
-    .load-bar-inner { background: linear-gradient(90deg, var(--success), var(--warning), var(--danger)); }
     .nav-tabs { display: flex; gap: 8px; }
     .tab-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-    .tab-btn.active { background: var(--primary); color: #0f172a; border-color: var(--primary); }
+    .tab-btn.active { background: var(--primary); color: #1e1b4b; border-color: var(--primary); }
     .cycle-control { display: flex; gap: 6px; align-items: center; background: var(--card-bg); padding: 5px 8px; border-radius: 8px; border: 1px solid var(--card-border); }
     .cycle-btn { background: transparent; border: 1px solid var(--card-border); color: var(--text); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
-    .cycle-btn.active { background: var(--primary); color: #0f172a; border-color: var(--primary); }
+    .cycle-btn.active { background: var(--primary); color: #1e1b4b; border-color: var(--primary); }
     .badge { display: inline-block; padding: 3px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    .badge-load { background: #1e3a8a; color: #93c5fd; }
+    .badge-load { background: #4c1d95; color: #c4b5fd; }
     .badge-deload { background: #064e3b; color: #86efac; }
-    .badge-peak { background: #7f1d1d; color: #fca5a5; }
+    .badge-peak { background: #831843; color: #fbcfe8; }
     .day-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
     .day-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text); padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; }
     .day-btn.active { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
@@ -48,28 +47,24 @@
     .card h2 { font-size: 1.15rem; margin-bottom: 10px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
     .section-header { display: flex; justify-content: space-between; align-items: center; margin: 14px 0 6px; }
     .section-title { font-size: 0.9rem; font-weight: 700; color: var(--accent); text-transform: uppercase; }
-    .section-title.running { color: var(--running); }
     .exercise-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-    .exercise-item { background: rgba(15, 23, 42, 0.6); padding: 9px 12px; border-radius: 6px; border-left: 3px solid var(--primary); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
-    .exercise-item.running-item { border-left-color: var(--running); }
+    .exercise-item { background: rgba(30, 27, 75, 0.6); padding: 9px 12px; border-radius: 6px; border-left: 3px solid var(--primary); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
     .exercise-item .meta { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 2px; }
     .item-actions button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; margin-left: 6px; font-size: 0.85rem; }
     .item-actions button:hover { color: var(--text); }
     .item-actions button.del:hover { color: var(--danger); }
     .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
     label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
-    select, input, textarea { background: #0f172a; border: 1px solid var(--card-border); color: var(--text); padding: 8px 10px; border-radius: 6px; outline: none; }
-    .btn { background: var(--primary); color: #0f172a; border: none; padding: 9px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; }
-    .btn-secondary { background: #334155; color: #fff; }
-    .btn-warning { background: var(--warning); color: #0f172a; }
-    .btn-success { background: var(--success); color: #0f172a; }
+    select, input, textarea { background: #1e1b4b; border: 1px solid var(--card-border); color: var(--text); padding: 8px 10px; border-radius: 6px; outline: none; }
+    .btn { background: var(--primary); color: #1e1b4b; border: none; padding: 9px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+    .btn-secondary { background: #4f46e5; color: #fff; }
+    .btn-warning { background: var(--warning); color: #1e1b4b; }
+    .btn-success { background: var(--success); color: #1e1b4b; }
     .btn-danger { background: var(--danger); color: #fff; }
     .btn-sm { padding: 4px 8px; font-size: 0.8rem; }
-    .adaptive-alert { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); border-radius: 8px; padding: 12px; margin-top: 14px; font-size: 0.85rem; }
-    .intensity-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 12px; }
-    .intensity-comparison strong { font-size: 1.2rem; }
     .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
-    .achievement-card { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; text-align: center; opacity: 0.4; transition: all 0.2s; }
+    .achievement-card { background: rgba(30, 27, 75, 0.6); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; text-align: center; opacity: 0.4; transition: all 0.2s; }
     .achievement-card.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(251, 191, 36, 0.15); }
     .achievement-card .icon { font-size: 1.6rem; margin-bottom: 4px; }
     .achievement-card .title { font-size: 0.75rem; font-weight: 700; color: #fff; display: block; }
@@ -77,19 +72,22 @@
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; }
     .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 20px; width: 90%; max-width: 500px; }
     
-    /* Engine 16 Net Load Display */
-    .net-load-display { margin-top: 16px; font-size: 0.95rem; text-align: center; background: rgba(56, 189, 248, 0.1); padding: 12px; border-radius: 6px; border: 1px dashed var(--primary); }
-    .net-load-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 8px; font-size: 0.85rem; color: var(--text-muted); }
-    .net-load-val { font-size: 1.2rem; font-weight: bold; color: #fff; display: block; }
-    .text-danger { color: #ef4444 !important; }
-    .text-success { color: #22c55e !important; }
+    /* Intensity Color Buttons */
+    .color-picker { display: flex; gap: 8px; margin-top: 4px; }
+    .color-btn { flex: 1; padding: 8px; border-radius: 6px; border: 2px solid transparent; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
+    .color-btn.green { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    .color-btn.yellow { background: rgba(234, 179, 8, 0.2); color: #fde047; }
+    .color-btn.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .color-btn.green.selected { background: #22c55e; color: #000; border-color: #fff; }
+    .color-btn.yellow.selected { background: #eab308; color: #000; border-color: #fff; }
+    .color-btn.red.selected { background: #ef4444; color: #000; border-color: #fff; }
   </style>
 </head>
 <body>
 
   <header>
     <div>
-      <h1>Adaptive System: Engine 16.0</h1>
+      <h1>Health & Vitality System</h1>
     </div>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
       <div class="nav-tabs">
@@ -98,21 +96,13 @@
         <button class="tab-btn" id="tabDatabase" onclick="switchView('database')">Database Sync</button>
       </div>
       <div class="cycle-control" id="cycleControls">
-        <span style="font-size: 0.8rem; font-weight: 600;" id="cycleLabel">C1:</span>
+        <span style="font-size: 0.8rem; font-weight: 600;" id="cycleLabel">Progression:</span>
         <div id="dynamicWeekButtons" style="display: flex; gap: 4px;"></div>
       </div>
     </div>
   </header>
 
   <div class="gamify-bar">
-    <div class="gamify-stat">
-      <div class="gamify-icon" style="color: var(--warning);">⚡</div>
-      <div class="gamify-info">
-        <div class="gamify-label">Continuous Load Buffer</div>
-        <div class="gamify-val" id="hudLoad">0 / 600 pts</div>
-        <div class="progress-bar-outer"><div class="progress-bar-inner load-bar-inner" id="hudLoadBar"></div></div>
-      </div>
-    </div>
     <div class="gamify-stat">
       <div class="gamify-icon" style="color: var(--fire);">🔥</div>
       <div class="gamify-info">
@@ -128,9 +118,16 @@
       </div>
     </div>
     <div class="gamify-stat">
+      <div class="gamify-icon" style="color: var(--accent);">👩‍❤️‍👨</div>
+      <div class="gamify-info">
+        <div class="gamify-label">Couples Workouts</div>
+        <div class="gamify-val" id="hudCouples">0 Logged</div>
+      </div>
+    </div>
+    <div class="gamify-stat">
       <div class="gamify-icon" style="color: var(--gold);">⭐</div>
       <div class="gamify-info">
-        <div class="gamify-label"><span id="hudLevel">Level 1</span> Swimmer</div>
+        <div class="gamify-label"><span id="hudLevel">Level 1</span></div>
         <div class="gamify-val" id="hudXp">0 XP</div>
         <div class="progress-bar-outer"><div class="progress-bar-inner" id="hudXpBar"></div></div>
       </div>
@@ -149,26 +146,29 @@
           </h2>
           
           <div class="section-header">
-            <span class="section-title">Dryland Session</span>
-            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('dryland')">+ Add</button>
+            <span class="section-title">Resistance Training</span>
+            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('resistance')">+ Add</button>
           </div>
-          <ul class="exercise-list" id="drylandList"></ul>
+          <ul class="exercise-list" id="resistanceList"></ul>
 
           <div class="section-header" style="margin-top: 18px;">
-            <span class="section-title">Pool Session</span>
-            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('pool')">+ Add</button>
+            <span class="section-title">Aerobic Session</span>
+            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('aerobic')">+ Add</button>
           </div>
-          <ul class="exercise-list" id="poolList"></ul>
+          <ul class="exercise-list" id="aerobicList"></ul>
 
           <div class="section-header" style="margin-top: 18px;">
-            <span class="section-title running">Run Session</span>
-            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('run')">+ Add</button>
+            <span class="section-title" style="color: var(--warning);">Daily Snack</span>
+            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('snack')">+ Add</button>
           </div>
-          <ul class="exercise-list" id="runList"></ul>
+          <ul class="exercise-list" id="snackList"></ul>
 
-          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center;">
-            <strong style="font-size: 0.9rem; color: #fff;">Mesocycle Transition</strong>
-            <button class="btn btn-warning btn-sm" onclick="advanceWeekWorkflow()">Complete & Advance Week ➔</button>
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--card-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <strong style="font-size: 0.9rem; color: #fff;">Progression Transition</strong>
+              <button class="btn btn-secondary btn-sm" onclick="reRollCurrentWeek()">🎲 Re-Roll Week</button>
+            </div>
+            <button class="btn btn-warning btn-sm" style="width: 100%;" onclick="advanceWeekWorkflow()">Complete & Advance Week ➔</button>
           </div>
         </div>
       </div>
@@ -176,38 +176,28 @@
       <div>
         <div class="card">
           <h2>Session Logging</h2>
-          <div class="intensity-comparison">
-            <div>
-              <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Target RPE</span>
-              <strong id="plannedRpeDisplay">--</strong>
-            </div>
-            <div>
-              <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Target Recovery</span>
-              <strong id="plannedRecDisplay">--</strong>
-            </div>
-          </div>
-
           <form onsubmit="handleLogSubmit(event)">
+            
             <div id="sessionLoggers"></div>
 
-            <div class="form-group" style="margin-top: 16px; padding: 12px; background: rgba(168, 85, 247, 0.1); border: 1px solid var(--accent); border-radius: 8px;">
-              <label style="color: #fff; font-size: 0.95rem; margin-bottom: 8px; display: block;">Session Recovery Score (0-10)</label>
-              <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="range" id="recovery_score" min="0" max="10" value="5" oninput="document.getElementById('rec_val_display').innerText = this.value; updateOverallRpe();" style="flex: 1; accent-color: var(--accent);" />
-                <strong id="rec_val_display" style="color: var(--accent); font-size: 1.2rem; min-width: 20px; text-align: right;">5</strong>
-              </div>
-              <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 6px;">0 = None, 5 = Active/Medium, 10 = Complete/Max Rest</span>
+            <div class="form-group" id="distanceField" style="display: none; background: rgba(52, 211, 153, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed var(--running); margin-top: 12px;">
+              <label style="color: var(--running);">Distance Completed (km)</label>
+              <input type="number" step="0.1" id="logDistance" placeholder="e.g. 3.5" />
             </div>
 
-            <div id="averageRpeDisplay"></div>
+            <div class="form-group" style="margin-top:12px; background: rgba(244, 114, 182, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed var(--accent);">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--accent); font-size: 0.95rem;">
+                <input type="checkbox" id="logCouples" style="width: 18px; height: 18px;" />
+                👩‍❤️‍👨 Couples Workout (+50 XP Bonus)
+              </label>
+            </div>
 
             <div class="form-group" style="margin-top:16px;">
-              <label>Overall Session Notes</label>
-              <textarea id="logNotes" rows="2" placeholder="Notes..."></textarea>
+              <label>How did it feel? (Notes)</label>
+              <textarea id="logNotes" rows="2" placeholder="Felt great, pushed the KB press..."></textarea>
             </div>
-            <button type="submit" class="btn" style="width: 100%;">Save Log & Update Buffer</button>
+            <button type="submit" class="btn" style="width: 100%;">Save Log & Earn XP</button>
           </form>
-          <div class="adaptive-alert" id="adaptiveFeedback"><strong>Buffer Engine:</strong> Fatigue scales with RPE, negated actively by Recovery.</div>
         </div>
       </div>
     </div>
@@ -226,19 +216,34 @@
         <h2>Google Drive Sync</h2>
         <button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset Progress</button>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Authenticate with Google to read/write your encrypted database directly to your personal Drive.</p>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Authenticate to sync data to Drive. <strong>Catalog</strong> syncs your exercises & blueprints. <strong>Progress</strong> syncs your weekly generated plan & streak.</p>
+      
       <div class="form-group" style="margin-bottom: 16px;">
         <label>Google OAuth Client ID</label>
         <input type="text" id="gcpClientId" placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com" />
+        <button class="btn btn-success btn-sm" style="margin-top: 6px; width: max-content;" onclick="saveClientId()">Save ID</button>
       </div>
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="btn btn-success btn-sm" onclick="saveClientId()">Save ID</button>
-        <button class="btn btn-primary btn-sm" onclick="authenticateDrive('push')">☁️ Save to Drive</button>
-        <button class="btn btn-primary btn-sm" onclick="authenticateDrive('pull')">⬇️ Load from Drive</button>
-        <button class="btn btn-secondary btn-sm" onclick="loadDataFromClipboard()">Load External JSON manually</button>
+      
+      <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+        <strong style="display: block; margin-bottom: 8px; font-size: 0.95rem; color: var(--primary);">1. Catalog & Blueprints</strong>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-sm" onclick="authenticateDrive('push', 'catalog')">☁️ Push Catalog</button>
+          <button class="btn btn-primary btn-sm" onclick="authenticateDrive('pull', 'catalog')">⬇️ Pull Catalog</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadDataFromClipboard()">Load JSON Manually</button>
+        </div>
       </div>
+
+      <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px;">
+        <strong style="display: block; margin-bottom: 8px; font-size: 0.95rem; color: var(--success);">2. Training Progress & Active Plan</strong>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-success btn-sm" onclick="authenticateDrive('push', 'state')">☁️ Push Progress</button>
+          <button class="btn btn-success btn-sm" onclick="authenticateDrive('pull', 'state')">⬇️ Pull Progress</button>
+        </div>
+      </div>
+
       <div id="syncStatus" style="font-size: 0.85rem; margin-top: 12px; color: var(--warning);"></div>
-      <textarea id="jsonArea" rows="6" style="width: 100%; margin-top: 12px; font-family: monospace; font-size: 0.8rem;"></textarea>
+      <label style="margin-top: 16px; display: block;">Catalog JSON (Read/Write)</label>
+      <textarea id="jsonArea" rows="6" style="width: 100%; margin-top: 4px; font-family: monospace; font-size: 0.8rem;"></textarea>
     </div>
   </div>
 
@@ -261,8 +266,29 @@
         </div>
 
         <div class="form-group" style="margin-top: 8px; border-top: 1px solid var(--card-border); padding-top: 8px;">
-          <label>Target Effort</label>
-          <input type="text" id="modalEffort" placeholder="e.g., Easy, Medium, Hard, Max" required />
+          <label>Prescription Math Model</label>
+          <select id="modalPrescriptionType" onchange="togglePrescriptionFields()">
+            <option value="reps">Sets & Reps (Resistance)</option>
+            <option value="duration">Duration (Aerobic)</option>
+            <option value="intervals">Intervals (HIIT)</option>
+          </select>
+        </div>
+
+        <div id="field_reps" class="form-row p-field">
+          <div class="form-group"><label>Sets</label><input type="number" id="modalRepSets" placeholder="e.g. 3" /></div>
+          <div class="form-group"><label>Reps</label><input type="number" id="modalRepCount" placeholder="e.g. 5" /></div>
+          <div class="form-group"><label>Rest (s)</label><input type="number" id="modalRepRest" placeholder="e.g. 60" /></div>
+        </div>
+        
+        <div id="field_duration" class="form-group p-field" style="display:none;">
+          <label>Total Minutes</label>
+          <input type="number" id="modalMin" placeholder="e.g. 20" />
+        </div>
+
+        <div id="field_intervals" class="form-row p-field" style="display:none;">
+          <div class="form-group"><label>Rounds</label><input type="number" id="modalIntSets" placeholder="e.g. 5" /></div>
+          <div class="form-group"><label>Work (s)</label><input type="number" id="modalIntWork" placeholder="e.g. 60" /></div>
+          <div class="form-group"><label>Rest (s)</label><input type="number" id="modalIntRest" placeholder="e.g. 60" /></div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
@@ -282,33 +308,35 @@
     ];
 
     const ACHIEVEMENTS_DATA = [
-      { id: "first_log", icon: "🚀", title: "First Splash", desc: "Log your first session" },
+      { id: "first_log", icon: "🚀", title: "First Step", desc: "Log your first session" },
+      { id: "snack_master", icon: "🍏", title: "Fitness Snacker", desc: "Log a quick daily snack" },
       { id: "streak_7", icon: "🔥", title: "Iron Habit", desc: "Achieve a 7-day streak" },
-      { id: "threshold_reached", icon: "🌋", title: "Buffer Smasher", desc: "Trigger a deload" },
-      { id: "runner_swimmer", icon: "🏃‍♂️", title: "Dual Athlete", desc: "Complete Run & Swim" },
-      { id: "shield_saver", icon: "🛡️", title: "Shield Veteran", desc: "Preserve a streak using a shield" }
+      { id: "couples_bronze", icon: "🥉", title: "Dynamic Duo (Bronze)", desc: "1 Couples Workout" },
+      { id: "couples_silver", icon: "🥈", title: "Dynamic Duo (Silver)", desc: "5 Couples Workouts" },
+      { id: "couples_gold", icon: "🥇", title: "Dynamic Duo (Gold)", desc: "10 Couples Workouts" },
+      { id: "couples_plat", icon: "💎", title: "Dynamic Duo (Plat)", desc: "25 Couples Workouts" }
     ];
 
-    const LOAD_BUFFER_THRESHOLD = 600;
-
-    let appData = JSON.parse(localStorage.getItem("swim_tracker_app_data"));
-    if (!appData || appData.version !== 14.0) {
-      appData = { version: 14.0, exercise_catalog: {}, mesocycle_structure: {} };
-      localStorage.setItem("swim_tracker_app_data", JSON.stringify(appData));
+    let appData = JSON.parse(localStorage.getItem("health_tracker_app_data"));
+    if (!appData || appData.version !== 1.0) {
+      appData = { version: 1.0, exercise_catalog: {}, mesocycle_structure: {} };
+      localStorage.setItem("health_tracker_app_data", JSON.stringify(appData));
+      localStorage.setItem("health_tracker_generated_plans", JSON.stringify({}));
     }
 
+    let metaState = JSON.parse(localStorage.getItem("health_tracker_meta")) || { cycle: 1, week: 1, activeWeeks: 6 };
+
     let state = {
-      currentCycle: 1, currentWeek: 1, activeWeeksInCycle: 3, currentDay: "sun",
-      logs: JSON.parse(localStorage.getItem("swim_tracker_logs")) || {},
-      engine: JSON.parse(localStorage.getItem("swim_tracker_engine")) || { accumulatedLoad: 0, isDeload: false },
-      gamify: JSON.parse(localStorage.getItem("swim_tracker_gamify")) || { xp: 0, streak: 0, shields: 2, unlocked: [] },
-      generatedPlans: JSON.parse(localStorage.getItem("swim_tracker_generated_plans")) || {}
+      currentCycle: metaState.cycle, currentWeek: metaState.week, activeWeeksInCycle: metaState.activeWeeks,
+      currentDay: DAYS[new Date().getDay()].id,
+      logs: JSON.parse(localStorage.getItem("health_tracker_logs")) || {},
+      gamify: JSON.parse(localStorage.getItem("health_tracker_gamify")) || { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [] },
+      generatedPlans: JSON.parse(localStorage.getItem("health_tracker_generated_plans")) || {}
     };
 
     function init() {
-      document.getElementById("gcpClientId").value = localStorage.getItem("gdrive_client_id") || "";
+      document.getElementById("gcpClientId").value = localStorage.getItem("health_gdrive_client_id") || "";
       ensurePlanExists(state.currentCycle, state.currentWeek);
-      calculateAccumulatedLoad();
       updateDynamicWeekButtons();
       renderHUD();
       renderDaySelector();
@@ -317,29 +345,36 @@
       document.getElementById("jsonArea").value = JSON.stringify(appData, null, 2);
     }
 
+    // --- SYSTEM MANAGEMENT FUNCTIONS ---
     function factoryReset() {
-      if (confirm("Are you sure you want to wipe all progress? Your JSON catalog will remain intact, but all logs, XP, and weekly progression will be reset to Week 1.")) {
-        localStorage.removeItem("swim_tracker_logs");
-        localStorage.removeItem("swim_tracker_engine");
-        localStorage.removeItem("swim_tracker_gamify");
-        localStorage.removeItem("swim_tracker_generated_plans");
-        location.reload();
+      if (confirm("⚠️ WARNING: This will permanently delete your logs, XP, and streaks to let you start fresh. Your weekly plans and blueprints will remain perfectly intact. Proceed?")) {
+        state.logs = {};
+        state.gamify = { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [] };
+        saveState();
+        init();
+        alert("Progress reset. Your training plan remains intact.");
       }
     }
 
-    function getActivePhaseKey(week, isDeload) {
-      if (isDeload) return "deload";
-      if (week === 1) return "week1";
-      if (week === 2) return "week2";
-      return "week3";
+    window.reRollCurrentWeek = function() {
+      if (confirm("🎲 Re-randomize this week's plan? Logged sessions will be preserved.")) {
+        const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
+        delete state.generatedPlans[planKey];
+        saveState();
+        ensurePlanExists(state.currentCycle, state.currentWeek);
+        renderDaySelector();
+        renderDayView();
+        alert("Current week successfully re-rolled!");
+      }
     }
+    // -----------------------------------
 
     function ensurePlanExists(cycle, week) {
       const key = `c${cycle}_w${week}`;
       if (!state.generatedPlans) state.generatedPlans = {};
       if (state.generatedPlans[key]) return; 
 
-      const phaseKey = getActivePhaseKey(week, state.engine.isDeload);
+      const phaseKey = week === 6 ? "week6_deload" : `week${week}`;
       const blueprint = appData.mesocycle_structure[phaseKey];
       if (!blueprint) return; 
 
@@ -347,7 +382,7 @@
       const catalog = appData.exercise_catalog || {};
 
       Object.keys(plan.days).forEach(dayId => {
-        ['dryland', 'pool', 'run'].forEach(type => {
+        ['resistance', 'aerobic', 'snack'].forEach(type => {
           const usedIds = new Set();
           if(plan.days[dayId][type]) {
             plan.days[dayId][type].forEach(slot => {
@@ -372,31 +407,19 @@
       saveState();
     }
 
-    function calculateAccumulatedLoad() {
-      let total = 0;
-      // Sort logs chronologically to accurately floor fatigue at 0 along the journey
-      const sortedLogs = Object.values(state.logs).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-      
-      sortedLogs.forEach(entry => {
-        if (entry.sessionStatus && entry.sessionStatus.overall !== 'missed') {
-            // Fallback for older logs before Engine 16
-            const net = entry.netLoad !== undefined ? entry.netLoad : ((entry.rpe || 0) * 10 * (entry.completionRatio || 1));
-            total = Math.max(0, total + net);
-        }
-      });
-      
-      state.engine.accumulatedLoad = total;
-      if (state.engine.accumulatedLoad >= LOAD_BUFFER_THRESHOLD && !state.engine.isDeload) {
-        state.engine.isDeload = true;
-        unlockBadge("threshold_reached");
-      }
+    function formatPrescription(p) {
+      if (!p) return "";
+      if (p.type === 'duration') return `${p.minutes} mins`;
+      if (p.type === 'intervals') return `${p.sets} rounds: ${p.work_sec}s work / ${p.rest_sec}s rest`;
+      if (p.type === 'reps') return `${p.sets} x ${p.reps} reps @ ${p.rest_sec}s rest`;
+      return "Manage on go";
     }
 
     function updateDynamicWeekButtons() {
       document.getElementById("cycleLabel").innerText = `C${state.currentCycle}:`;
       const container = document.getElementById("dynamicWeekButtons");
       container.innerHTML = "";
-      const displayCount = Math.max(3, Math.min(6, Math.max(state.currentWeek, state.activeWeeksInCycle)));
+      const displayCount = 6;
       for (let w = 1; w <= displayCount; w++) {
         const btn = document.createElement("button");
         btn.className = `cycle-btn ${w === state.currentWeek ? "active" : ""}`;
@@ -428,16 +451,14 @@
     function selectDay(d) { state.currentDay = d; renderDaySelector(); renderDayView(); }
 
     function renderHUD() {
-      const g = state.gamify, eng = state.engine;
+      const g = state.gamify;
       document.getElementById("hudStreak").innerText = `${g.streak} Day${g.streak === 1 ? '' : 's'}`;
       document.getElementById("hudShields").innerText = `${g.shields} / 3`;
+      document.getElementById("hudCouples").innerText = `${g.couplesCount || 0} Logged`;
       const level = Math.floor(g.xp / 400) + 1;
       document.getElementById("hudLevel").innerText = `Level ${level}`;
       document.getElementById("hudXp").innerText = `${g.xp} XP`;
       document.getElementById("hudXpBar").style.width = `${Math.min(100, ((g.xp % 400) / 400) * 100)}%`;
-      const loadPercent = Math.min(100, (eng.accumulatedLoad / LOAD_BUFFER_THRESHOLD) * 100);
-      document.getElementById("hudLoad").innerText = `${Math.round(eng.accumulatedLoad)} / ${LOAD_BUFFER_THRESHOLD} pts`;
-      document.getElementById("hudLoadBar").style.width = `${loadPercent}%`;
     }
 
     function renderDaySelector() {
@@ -455,108 +476,59 @@
       });
     }
 
-    window.toggleRpe = function(key) {
-      const status = document.getElementById(`status_${key}`).value;
-      const container = document.getElementById(`rpe_container_${key}`);
-      if(container) {
-          container.style.display = (status === 'missed') ? 'none' : 'flex';
-      }
-      updateOverallRpe();
-    };
-
-    window.updateOverallRpe = function() {
-      let sumRpe = 0;
-      let count = 0;
-      ['dryland', 'pool', 'run'].forEach(key => {
-          const statusEl = document.getElementById(`status_${key}`);
-          const rpeEl = document.getElementById(`rpe_${key}`);
-          if (statusEl && rpeEl && statusEl.value !== 'missed') {
-              sumRpe += parseFloat(rpeEl.value);
-              count++;
-          }
-      });
-      
-      const avgRpe = count > 0 ? (sumRpe / count) : 0;
-      const recScore = parseFloat(document.getElementById("recovery_score").value) || 0;
-      
-      const fatigueGen = Math.round(avgRpe * 10);
-      const recCleared = Math.round(recScore * 20);
-      const netLoad = fatigueGen - recCleared;
-      
-      const netClass = netLoad > 0 ? 'text-danger' : (netLoad < 0 ? 'text-success' : '');
-
-      const container = document.getElementById("averageRpeDisplay");
-      if(container) {
-        container.innerHTML = `
-          <div class="net-load-display">
-            <strong>Engine 16 Analytics</strong>
-            <div class="net-load-grid">
-              <div>
-                Load Added
-                <span class="net-load-val text-danger">+${fatigueGen}</span>
-              </div>
-              <div>
-                Rest Cleared
-                <span class="net-load-val text-success">-${recCleared}</span>
-              </div>
-              <div>
-                Net Fatigue
-                <span class="net-load-val ${netClass}">${netLoad > 0 ? '+' : ''}${netLoad}</span>
-              </div>
-            </div>
-          </div>
-        `;
-      }
+    window.selectColor = function(key, color) {
+      document.getElementById(`color_val_${key}`).value = color;
+      const btns = document.querySelectorAll(`.btn-${key}`);
+      btns.forEach(b => b.classList.remove('selected'));
+      document.getElementById(`btn_${key}_${color}`).classList.add('selected');
     };
 
     function renderSessionLoggers(dayData, existingLog) {
       const container = document.getElementById("sessionLoggers");
       container.innerHTML = "";
       const statuses = existingLog ? (existingLog.sessionStatus || {}) : {};
-      const rpes = existingLog ? (existingLog.sessionRpes || {}) : {};
-      const plannedRpe = Math.round(dayData.baseRpe || 5);
+      const colors = existingLog ? (existingLog.sessionColors || {}) : {};
       
       let hasScheduled = false;
+      let hasAerobic = false;
 
       const renderLogger = (key, label) => {
         if (!dayData[key] || dayData[key].length === 0) return;
         hasScheduled = true;
+        if (key === 'aerobic') hasAerobic = true;
         
-        const isRest = dayData[key].some(item => item.category === 'rest');
-        const defaultRpe = isRest ? 0 : plannedRpe;
         const statusVal = statuses[key] || "completed";
-        const rpeVal = rpes[key] !== undefined ? rpes[key] : defaultRpe;
+        const colorVal = colors[key] || "";
         
         container.innerHTML += `
-          <div class="form-group" style="border-left: 2px solid var(--primary); padding-left: 10px; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 6px;">
+          <div class="form-group" style="border-left: 2px solid var(--primary); padding-left: 10px; margin-bottom: 12px; background: rgba(30, 27, 75, 0.4); padding: 10px; border-radius: 6px;">
             <label style="color: #fff; font-size: 0.95rem; margin-bottom: 6px;">${label}</label>
             <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                <select id="status_${key}" style="flex: 1; border-color: var(--primary);" onchange="toggleRpe('${key}')">
+                <select id="status_${key}" style="flex: 1; border-color: var(--primary);">
                   <option value="completed" ${statusVal==='completed'?'selected':''}>Completed</option>
                   <option value="modified" ${statusVal==='modified'?'selected':''}>Modified</option>
                   <option value="missed" ${statusVal==='missed'?'selected':''}>Missed / Skipped</option>
                 </select>
             </div>
-            <div id="rpe_container_${key}" style="display: ${statusVal==='missed' ? 'none' : 'flex'}; gap: 10px; align-items: center;">
-                <span style="font-size: 0.8rem; color: var(--text-muted); width: 40px;">RPE:</span>
-                <input type="range" id="rpe_${key}" min="0" max="10" value="${rpeVal}" oninput="document.getElementById('rpe_val_${key}').innerText = this.value; updateOverallRpe();" style="flex: 1;" />
-                <strong id="rpe_val_${key}" style="color: var(--primary); font-size: 1.1rem; min-width: 20px; text-align: right;">${rpeVal}</strong>
+            <input type="hidden" id="color_val_${key}" value="${colorVal}" />
+            <div class="color-picker" id="rpe_container_${key}">
+              <div id="btn_${key}_green" class="color-btn green btn-${key} ${colorVal==='green'?'selected':''}" onclick="selectColor('${key}', 'green')">🟢 Light</div>
+              <div id="btn_${key}_yellow" class="color-btn yellow btn-${key} ${colorVal==='yellow'?'selected':''}" onclick="selectColor('${key}', 'yellow')">🟡 Mod</div>
+              <div id="btn_${key}_red" class="color-btn red btn-${key} ${colorVal==='red'?'selected':''}" onclick="selectColor('${key}', 'red')">🔴 Hard</div>
             </div>
           </div>
         `;
       };
 
-      renderLogger('dryland', 'Dryland Session');
-      renderLogger('pool', 'Pool Session');
-      renderLogger('run', 'Run Session');
+      renderLogger('resistance', 'Resistance Session');
+      renderLogger('aerobic', 'Aerobic / Cardio');
+      renderLogger('snack', 'Daily Snack');
+
+      document.getElementById("distanceField").style.display = hasAerobic ? "block" : "none";
 
       if (!hasScheduled) {
-        container.innerHTML = `
-          <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Rest Day. Maintain habit by saving log to earn recovery points.</div>
-        `;
+        container.innerHTML = `<div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Rest Day. Maintain your habit by saving the log!</div>`;
       }
-      
-      setTimeout(updateOverallRpe, 0); 
     }
 
     function renderDayView() {
@@ -564,57 +536,42 @@
       const plan = state.generatedPlans[planKey];
       if (!plan || !plan.days) return;
 
-      const dayData = plan.days[state.currentDay] || { dryland: [], pool: [], run: [], baseRpe: 0.0 };
+      const dayData = plan.days[state.currentDay] || { resistance: [], aerobic: [], snack: [] };
       const existingLog = state.logs[`${planKey}_${state.currentDay}`];
 
-      const durationText = dayData.duration ? `<span style="font-size: 0.85rem; color: var(--text-muted); font-weight: normal; margin-left: 8px;">⏱️ ${dayData.duration}</span>` : "";
-      document.getElementById("currentDayTitle").innerHTML = `${DAYS.find(d => d.id === state.currentDay).name} Plan ${durationText}`;
-      
+      document.getElementById("currentDayTitle").innerText = `${DAYS.find(d => d.id === state.currentDay).name} Plan`;
       document.getElementById("weekPhaseBadge").className = `badge ${plan.badge}`;
-      document.getElementById("weekPhaseBadge").innerText = state.engine.isDeload ? "Deload Week: Recovery & Restoration" : `${plan.phaseName}`;
+      document.getElementById("weekPhaseBadge").innerText = plan.phaseName;
 
-      renderExerciseList("dryland", dayData.dryland || []);
-      renderExerciseList("pool", dayData.pool || []);
-      renderExerciseList("run", dayData.run || []);
-      
-      // Calculate Default Recovery based on baseRpe
-      let defaultRec = 0;
-      if (dayData.baseRpe <= 2.5) defaultRec = 10;
-      else if (dayData.baseRpe <= 6.0) defaultRec = 5;
-      else defaultRec = 0;
-
-      const plannedRpe = (dayData.baseRpe || 0).toFixed(1);
-      document.getElementById("plannedRpeDisplay").innerText = plannedRpe;
-      document.getElementById("plannedRecDisplay").innerText = defaultRec;
-      
-      // Set slider before rendering
-      const recSlider = document.getElementById("recovery_score");
-      recSlider.value = existingLog && existingLog.recoveryScore !== undefined ? existingLog.recoveryScore : defaultRec;
-      document.getElementById("rec_val_display").innerText = recSlider.value;
-
+      renderExerciseList("resistance", dayData.resistance || []);
+      renderExerciseList("aerobic", dayData.aerobic || []);
+      renderExerciseList("snack", dayData.snack || []);
       renderSessionLoggers(dayData, existingLog);
 
       if (existingLog) {
-        document.getElementById("loggedRpeDisplay").innerText = Number(existingLog.rpe).toFixed(1);
         document.getElementById("logNotes").value = existingLog.notes || "";
+        document.getElementById("logDistance").value = existingLog.distance || "";
+        document.getElementById("logCouples").checked = existingLog.couples || false;
       } else {
-        document.getElementById("loggedRpeDisplay").innerText = "--";
         document.getElementById("logNotes").value = "";
+        document.getElementById("logDistance").value = "";
+        document.getElementById("logCouples").checked = false;
       }
     }
 
     function renderExerciseList(type, list) {
       const catalog = appData.exercise_catalog || {};
       document.getElementById(`${type}List`).innerHTML = list.map((item, index) => {
-        if (!item.exerciseId || !catalog[item.exerciseId]) return `<li class="exercise-item"><div><strong>No matching exercise found in Catalog</strong><span class="meta">${item.category}</span></div></li>`;
+        if (!item.exerciseId || !catalog[item.exerciseId]) return `<li class="exercise-item"><div><strong>No matching exercise found</strong></div></li>`;
         const entry = catalog[item.exerciseId];
         return `
-          <li class="exercise-item ${type === 'run' ? 'running-item' : ''}">
+          <li class="exercise-item">
             <div>
               <strong>${entry.name}</strong>
               <span class="meta" style="color:var(--accent); font-weight:600;">${item.category.toUpperCase().replace("_"," ")}</span>
-              <span class="meta" style="color: #fff;">${item.effort ? `<strong>Target: ${item.effort}</strong>` : 'Manage on go'}</span>
+              <span class="meta" style="color: #fff;">${formatPrescription(item.prescription)}</span>
               ${entry.equipment && entry.equipment !== 'None' ? `<span class="meta">• ${entry.equipment}</span>` : ''}
+              ${entry.notes ? `<span class="meta" style="font-style:italic;">${entry.notes}</span>` : ''}
             </div>
             <div class="item-actions">
               <button onclick="openEditExerciseModal('${type}', ${index})">✎</button>
@@ -629,17 +586,15 @@
       e.preventDefault();
       const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
       const logKey = `${planKey}_${state.currentDay}`;
-      const dayData = state.generatedPlans[planKey].days[state.currentDay];
-      const plannedRpe = (dayData.baseRpe || 0);
       const notes = document.getElementById("logNotes").value;
-      const recScore = parseFloat(document.getElementById("recovery_score").value) || 0;
+      const distance = document.getElementById("logDistance").value;
+      const isCouples = document.getElementById("logCouples").checked;
 
       const sessionStatus = {};
-      const sessionRpes = {};
+      const sessionColors = {};
       let scheduledCount = 0; let completedCount = 0;
-      let sumRpe = 0;
 
-      ['dryland', 'pool', 'run'].forEach(key => {
+      ['resistance', 'aerobic', 'snack'].forEach(key => {
         const el = document.getElementById(`status_${key}`);
         if (el) {
           const status = el.value;
@@ -647,9 +602,7 @@
           scheduledCount++;
           if (status === 'completed' || status === 'modified') {
             completedCount++;
-            const rpeVal = parseFloat(document.getElementById(`rpe_${key}`).value);
-            sessionRpes[key] = rpeVal;
-            sumRpe += rpeVal;
+            sessionColors[key] = document.getElementById(`color_val_${key}`).value || 'green';
           }
         }
       });
@@ -658,13 +611,6 @@
       const completionRatio = isRestDay ? 1.0 : (completedCount / scheduledCount);
       const isNewLog = !state.logs[logKey];
       
-      let finalRpe = completedCount > 0 ? (sumRpe / completedCount) : 0;
-
-      // Engine 16 Math
-      const fatigueGen = finalRpe * 10 * completionRatio;
-      const recCleared = recScore * 20;
-      const netLoad = fatigueGen - recCleared;
-
       if (completionRatio === 0 && !isRestDay) {
         if (state.gamify.shields > 0) {
           if (isNewLog) state.gamify.shields -= 1;
@@ -678,50 +624,53 @@
       } else {
         if (isNewLog) {
           state.gamify.streak += 1;
-          
+          unlockBadge("first_log");
+          if (state.gamify.streak >= 7) unlockBadge("streak_7");
+
+          // SHIELD RECOVERY LOGIC
           if (state.gamify.streak % 7 === 0) {
             if (state.gamify.shields < 3) {
               state.gamify.shields += 1;
               alert("🛡️ 7-Day Streak! You earned a Streak Shield!");
             } else {
-              alert("🔥 7-Day Streak! (Shields full at 3/3)");
+              alert("🔥 7-Day Streak! (Shields are full at 3/3)");
             }
           }
           
           let earnedXp = isRestDay ? 30 : Math.round(100 * completionRatio);
+          if (sessionStatus.snack && sessionStatus.snack !== 'missed') {
+             earnedXp += 25; 
+             unlockBadge("snack_master");
+          }
+          if (isCouples) {
+             earnedXp += 50;
+             state.gamify.couplesCount = (state.gamify.couplesCount || 0) + 1;
+             checkCouplesBadges();
+          }
           state.gamify.xp += earnedXp;
         }
         sessionStatus.overall = "completed";
       }
 
-      state.logs[logKey] = { 
-        rpe: finalRpe, 
-        recoveryScore: recScore,
-        netLoad: netLoad,
-        sessionRpes, 
-        rpeDelta: finalRpe - plannedRpe, 
-        sessionStatus, 
-        completionRatio, 
-        notes, 
-        timestamp: new Date().toISOString() 
-      };
-      
-      calculateAccumulatedLoad(); 
-      saveState(); 
-      init();
+      state.logs[logKey] = { sessionColors, sessionStatus, distance, couples: isCouples, completionRatio, notes, timestamp: new Date().toISOString() };
+      saveState(); init();
+    }
+
+    function checkCouplesBadges() {
+       const count = state.gamify.couplesCount;
+       if (count >= 1) unlockBadge("couples_bronze");
+       if (count >= 5) unlockBadge("couples_silver");
+       if (count >= 10) unlockBadge("couples_gold");
+       if (count >= 25) unlockBadge("couples_plat");
     }
 
     function advanceWeekWorkflow() {
-      // ENGINE 16: Load no longer resets. It flows continuously.
-      if (state.engine.isDeload || state.currentWeek >= 6) {
+      if (state.currentWeek >= 6) {
         if (confirm(`Conclude Cycle ${state.currentCycle}?`)) {
-          state.currentCycle++; state.currentWeek = 1; state.activeWeeksInCycle = 3;
-          state.engine.isDeload = false; state.gamify.xp += 200;
+          state.currentCycle++; state.currentWeek = 1; state.gamify.xp += 200;
         }
       } else {
         state.currentWeek++;
-        if (state.currentWeek > state.activeWeeksInCycle) state.activeWeeksInCycle = state.currentWeek;
-        if (state.currentWeek === 6) state.engine.isDeload = true;
       }
       ensurePlanExists(state.currentCycle, state.currentWeek);
       saveState(); init(); selectDay("sun");
@@ -738,10 +687,10 @@
     }
 
     function saveState() {
-      localStorage.setItem("swim_tracker_logs", JSON.stringify(state.logs));
-      localStorage.setItem("swim_tracker_engine", JSON.stringify(state.engine));
-      localStorage.setItem("swim_tracker_gamify", JSON.stringify(state.gamify));
-      localStorage.setItem("swim_tracker_generated_plans", JSON.stringify(state.generatedPlans));
+      localStorage.setItem("health_tracker_logs", JSON.stringify(state.logs));
+      localStorage.setItem("health_tracker_gamify", JSON.stringify(state.gamify));
+      localStorage.setItem("health_tracker_generated_plans", JSON.stringify(state.generatedPlans));
+      localStorage.setItem("health_tracker_meta", JSON.stringify({ cycle: state.currentCycle, week: state.currentWeek, activeWeeks: state.activeWeeksInCycle }));
     }
 
     /* Modal / Category Extractor Editor */
@@ -776,12 +725,26 @@
       });
     }
 
+    window.togglePrescriptionFields = function() {
+      const t = document.getElementById("modalPrescriptionType").value;
+      document.querySelectorAll(".p-field").forEach(el => el.style.display = 'none');
+      document.getElementById(`field_${t}`).style.display = t === 'duration' ? 'flex' : 'grid';
+    }
+
     function openAddExerciseModal(type) {
       document.getElementById("modalType").value = type;
       document.getElementById("modalEditIndex").value = "-1";
       document.getElementById("modalTitle").innerText = `Add to ${type.toUpperCase()}`;
-      document.getElementById("modalEffort").value = "";
+      
+      document.getElementById("modalPrescriptionType").value = "reps";
+      document.getElementById("modalRepSets").value = "";
+      document.getElementById("modalRepCount").value = "";
+      document.getElementById("modalRepRest").value = "";
+      document.getElementById("modalMin").value = "";
+      document.getElementById("modalIntSets").value = "";
+      
       populateCategoryDropdown(type);
+      togglePrescriptionFields();
       document.getElementById("exerciseModal").style.display = "flex";
     }
     
@@ -792,10 +755,26 @@
       document.getElementById("modalType").value = type;
       document.getElementById("modalEditIndex").value = index;
       document.getElementById("modalTitle").innerText = `Edit ${type.toUpperCase()}`;
-      document.getElementById("modalEffort").value = item.effort || "";
       
       populateCategoryDropdown(type, item.category);
       populateGroupedDropdown(item.exerciseId);
+
+      const p = item.prescription || {type: 'reps'};
+      document.getElementById("modalPrescriptionType").value = p.type || 'reps';
+      
+      if (p.type === 'duration') { document.getElementById("modalMin").value = p.minutes || ""; }
+      else if (p.type === 'intervals') {
+        document.getElementById("modalIntSets").value = p.sets || "";
+        document.getElementById("modalIntWork").value = p.work_sec || "";
+        document.getElementById("modalIntRest").value = p.rest_sec || "";
+      }
+      else {
+        document.getElementById("modalRepSets").value = p.sets || "";
+        document.getElementById("modalRepCount").value = p.reps || "";
+        document.getElementById("modalRepRest").value = p.rest_sec || "";
+      }
+
+      togglePrescriptionFields();
       document.getElementById("exerciseModal").style.display = "flex";
     }
     
@@ -807,13 +786,26 @@
       const index = parseInt(document.getElementById("modalEditIndex").value);
       const category = document.getElementById("modalCategorySelect").value;
       const exerciseId = document.getElementById("modalExerciseSelect").value;
-      const effort = document.getElementById("modalEffort").value;
+      const pType = document.getElementById("modalPrescriptionType").value;
+
+      let prescription = { type: pType };
+      if (pType === 'duration') { prescription.minutes = parseInt(document.getElementById("modalMin").value) || 0; }
+      else if (pType === 'intervals') {
+        prescription.sets = parseInt(document.getElementById("modalIntSets").value) || 0;
+        prescription.work_sec = parseInt(document.getElementById("modalIntWork").value) || 0;
+        prescription.rest_sec = parseInt(document.getElementById("modalIntRest").value) || 0;
+      }
+      else {
+        prescription.sets = parseInt(document.getElementById("modalRepSets").value) || 0;
+        prescription.reps = parseInt(document.getElementById("modalRepCount").value) || 0;
+        prescription.rest_sec = parseInt(document.getElementById("modalRepRest").value) || 0;
+      }
 
       const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
       const arr = state.generatedPlans[planKey].days[state.currentDay][type];
       
-      if (index === -1) arr.push({ category, exerciseId, effort });
-      else arr[index] = { category, exerciseId, effort };
+      if (index === -1) arr.push({ category, exerciseId, prescription });
+      else arr[index] = { category, exerciseId, prescription };
       
       saveState(); closeModal(); renderDayView();
     }
@@ -824,24 +816,25 @@
       saveState(); renderDayView();
     }
     
+    /* MANUAL LOAD - ONLY UPDATES CATALOG (Safe) */
     function loadDataFromClipboard() {
       try { 
         appData = JSON.parse(document.getElementById("jsonArea").value); 
-        delete state.generatedPlans[`c${state.currentCycle}_w${state.currentWeek}`]; // Force re-roll
-        localStorage.setItem("swim_tracker_app_data", JSON.stringify(appData));
-        saveState();
+        localStorage.setItem("health_tracker_app_data", JSON.stringify(appData));
         init(); 
-        alert("Database loaded and current week regenerated!"); 
+        alert("Catalog loaded! If your generated plan disappeared, it was wiped to safely update to the new version format."); 
       } catch(e) { alert("Invalid JSON format."); }
     }
 
+    /* GOOGLE DRIVE SYNC: SPLIT FOR CATALOG vs STATE */
     const SCOPES = 'https://www.googleapis.com/auth/drive.file';
     let tokenClient;
     let pendingAction = null;
+    let pendingTarget = null;
 
     function saveClientId() {
       const id = document.getElementById("gcpClientId").value.trim();
-      if(id) { localStorage.setItem("gdrive_client_id", id); alert("Client ID Saved."); }
+      if(id) { localStorage.setItem("health_gdrive_client_id", id); alert("Client ID Saved."); }
     }
 
     function updateSyncStatus(msg, isError=false) {
@@ -849,35 +842,40 @@
       el.innerText = msg; el.style.color = isError ? "var(--danger)" : "var(--success)";
     }
 
-    function authenticateDrive(action) {
-      const clientId = localStorage.getItem("gdrive_client_id");
+    function authenticateDrive(action, target) {
+      const clientId = localStorage.getItem("health_gdrive_client_id");
       if (!clientId) return updateSyncStatus("Please enter your Google Client ID first.", true);
-      updateSyncStatus("Authenticating with Google...");
+      updateSyncStatus(`Authenticating with Google for ${target}...`);
       pendingAction = action;
+      pendingTarget = target;
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: clientId, scope: SCOPES,
         callback: (response) => {
           if (response.error) updateSyncStatus("Authentication failed.", true);
           else {
-              if (pendingAction === 'push') executePush(response.access_token);
-              else if (pendingAction === 'pull') executePull(response.access_token);
+              if (pendingAction === 'push') executePush(response.access_token, pendingTarget);
+              else if (pendingAction === 'pull') executePull(response.access_token, pendingTarget);
           }
         }
       });
       tokenClient.requestAccessToken();
     }
 
-    async function executePush(token) {
-      updateSyncStatus("Uploading to Drive...");
+    async function executePush(token, target) {
+      const fileName = target === 'catalog' ? 'health_tracker_catalog.json' : 'health_tracker_state.json';
+      updateSyncStatus(`Uploading ${target} to Drive...`);
       try {
-        const query = encodeURIComponent("name='swim_tracker_db.json' and trashed=false");
+        const query = encodeURIComponent(`name='${fileName}' and trashed=false`);
         const listRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id)`, { headers: { Authorization: `Bearer ${token}` }});
         const listData = await listRes.json();
         
-        const buildPayload = () => JSON.stringify({ appData, logs: state.logs, engine: state.engine, gamify: state.gamify, generatedPlans: state.generatedPlans, currentWeek: state.currentWeek, currentCycle: state.currentCycle });
+        const buildPayload = () => {
+            if (target === 'catalog') return JSON.stringify({ appData });
+            return JSON.stringify({ state, metaState });
+        };
 
         if (!listData.files || listData.files.length === 0) {
-          const metadata = { name: 'swim_tracker_db.json', mimeType: 'application/json' };
+          const metadata = { name: fileName, mimeType: 'application/json' };
           const form = new FormData();
           form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
           form.append('file', new Blob([buildPayload()], { type: 'application/json' }));
@@ -887,39 +885,46 @@
           const fileId = listData.files[0].id;
           await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: buildPayload() });
         }
-        updateSyncStatus(`✓ Successfully Saved to Drive (${new Date().toLocaleTimeString()})`);
+        updateSyncStatus(`✓ Successfully Pushed ${target} (${new Date().toLocaleTimeString()})`);
       } catch (err) { updateSyncStatus(`Upload Error: ${err.message}`, true); }
     }
 
-    async function executePull(token) {
-      updateSyncStatus("Downloading from Drive...");
+    async function executePull(token, target) {
+      const fileName = target === 'catalog' ? 'health_tracker_catalog.json' : 'health_tracker_state.json';
+      updateSyncStatus(`Downloading ${target} from Drive...`);
       try {
-        const query = encodeURIComponent("name='swim_tracker_db.json' and trashed=false");
+        const query = encodeURIComponent(`name='${fileName}' and trashed=false`);
         const listRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id)`, { headers: { Authorization: `Bearer ${token}` }});
         const listData = await listRes.json();
 
         if (!listData.files || listData.files.length === 0) {
-            return updateSyncStatus("No database found on Drive. Save to Drive first.", true);
+            return updateSyncStatus(`No ${target} found on Drive. Push to Drive first.`, true);
         }
 
         const fileId = listData.files[0].id;
         const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, { headers: { Authorization: `Bearer ${token}` }});
         const data = await res.json();
         
-        appData = data.appData; 
-        state.logs = data.logs; 
-        state.engine = data.engine; 
-        state.gamify = data.gamify;
-        state.generatedPlans = data.generatedPlans || {};
-        state.currentWeek = data.currentWeek; 
-        state.currentCycle = data.currentCycle;
+        if (target === 'catalog') {
+            if(data.appData) appData = data.appData;
+            localStorage.setItem("health_tracker_app_data", JSON.stringify(appData));
+        } else {
+            if(data.state) {
+                state.logs = data.state.logs || {};
+                state.gamify = data.state.gamify || { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [] };
+                state.generatedPlans = data.state.generatedPlans || {};
+                state.currentCycle = data.state.currentCycle;
+                state.currentWeek = data.state.currentWeek;
+                state.activeWeeksInCycle = data.state.activeWeeksInCycle;
+            }
+            if(data.metaState) {
+                metaState = data.metaState;
+            }
+            saveState();
+        }
 
-        delete state.generatedPlans[`c${state.currentCycle}_w${state.currentWeek}`];
-
-        localStorage.setItem("swim_tracker_app_data", JSON.stringify(appData)); 
-        saveState(); 
         init();
-        updateSyncStatus(`✓ Successfully Loaded from Drive (${new Date().toLocaleTimeString()})`);
+        updateSyncStatus(`✓ Successfully Pulled ${target} (${new Date().toLocaleTimeString()})`);
       } catch (err) { updateSyncStatus(`Download Error: ${err.message}`, true); }
     }
 
