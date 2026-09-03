@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Health & Vitality Tracker</title>
+  <title>מעקב בריאות וחיוניות</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
@@ -13,8 +13,8 @@
       --success: #22c55e; --warning: #eab308; --danger: #ef4444;
       --gold: #fbbf24; --fire: #f97316;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; max-width: 1250px; margin: 0 auto; direction: ltr; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; max-width: 1250px; margin: 0 auto; }
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--card-border); flex-wrap: wrap; gap: 12px; }
     h1 { font-size: 1.35rem; color: var(--primary); }
     .gamify-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
@@ -24,7 +24,7 @@
     .gamify-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; }
     .gamify-val { font-size: 1.2rem; font-weight: 800; color: #fff; }
     .progress-bar-outer { background: #1e1b4b; border-radius: 999px; height: 7px; width: 100%; margin-top: 5px; overflow: hidden; border: 1px solid var(--card-border); }
-    .progress-bar-inner { background: linear-gradient(90deg, var(--primary), var(--accent)); height: 100%; width: 0%; transition: width 0.4s ease; }
+    .progress-bar-inner { background: linear-gradient(270deg, var(--primary), var(--accent)); height: 100%; width: 0%; transition: width 0.4s ease; }
     .nav-tabs { display: flex; gap: 8px; }
     .tab-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
     .tab-btn.active { background: var(--primary); color: #1e1b4b; border-color: var(--primary); }
@@ -48,9 +48,9 @@
     .section-header { display: flex; justify-content: space-between; align-items: center; margin: 14px 0 6px; }
     .section-title { font-size: 0.9rem; font-weight: 700; color: var(--accent); text-transform: uppercase; }
     .exercise-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-    .exercise-item { background: rgba(30, 27, 75, 0.6); padding: 9px 12px; border-radius: 6px; border-left: 3px solid var(--primary); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+    .exercise-item { background: rgba(30, 27, 75, 0.6); padding: 9px 12px; border-radius: 6px; border-right: 3px solid var(--primary); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
     .exercise-item .meta { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 4px; }
-    .item-actions button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; margin-left: 6px; font-size: 0.85rem; }
+    .item-actions button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; margin-right: 6px; font-size: 0.85rem; }
     .item-actions button:hover { color: var(--text); }
     .item-actions button.del:hover { color: var(--danger); }
     .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
@@ -87,16 +87,16 @@
 
   <header>
     <div>
-      <h1>Health & Vitality System</h1>
+      <h1>מערכת מעקב בריאות וחיוניות</h1>
     </div>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
       <div class="nav-tabs">
-        <button class="tab-btn active" id="tabPlanner" onclick="switchView('planner')">Planner</button>
-        <button class="tab-btn" id="tabAchievements" onclick="switchView('achievements')">Badges</button>
-        <button class="tab-btn" id="tabDatabase" onclick="switchView('database')">Database Sync</button>
+        <button class="tab-btn active" id="tabPlanner" onclick="switchView('planner')">יומן אימונים</button>
+        <button class="tab-btn" id="tabAchievements" onclick="switchView('achievements')">הישגים ותגים</button>
+        <button class="tab-btn" id="tabDatabase" onclick="switchView('database')">סנכרון נתונים</button>
       </div>
       <div class="cycle-control" id="cycleControls">
-        <span style="font-size: 0.8rem; font-weight: 600;" id="cycleLabel">Progression:</span>
+        <span style="font-size: 0.8rem; font-weight: 600;" id="cycleLabel">התקדמות:</span>
         <div id="dynamicWeekButtons" style="display: flex; gap: 4px;"></div>
       </div>
     </div>
@@ -106,35 +106,35 @@
     <div class="gamify-stat">
       <div class="gamify-icon" style="color: var(--fire);">🔥</div>
       <div class="gamify-info">
-        <div class="gamify-label">Current Streak</div>
-        <div class="gamify-val" id="hudStreak">0 Days</div>
+        <div class="gamify-label">רצף נוכחי</div>
+        <div class="gamify-val" id="hudStreak">0 ימים</div>
       </div>
     </div>
     <div class="gamify-stat">
       <div class="gamify-icon" style="color: var(--primary);">🛡️</div>
       <div class="gamify-info">
-        <div class="gamify-label">Streak Shields</div>
+        <div class="gamify-label">מגני רצף</div>
         <div class="gamify-val" id="hudShields">0 / 3</div>
       </div>
     </div>
     <div class="gamify-stat">
       <div class="gamify-icon" style="color: var(--success);">🎯</div>
       <div class="gamify-info">
-        <div class="gamify-label">Effort Compliance</div>
+        <div class="gamify-label">עמידה ביעדי מאמץ</div>
         <div class="gamify-val" id="hudCompliance">0%</div>
       </div>
     </div>
     <div class="gamify-stat">
       <div class="gamify-icon" style="color: var(--accent);">👩‍❤️‍👨</div>
       <div class="gamify-info">
-        <div class="gamify-label">Couples Workouts</div>
-        <div class="gamify-val" id="hudCouples">0 Logged</div>
+        <div class="gamify-label">אימונים זוגיים</div>
+        <div class="gamify-val" id="hudCouples">0 אימונים</div>
       </div>
     </div>
     <div class="gamify-stat">
       <div class="gamify-icon" style="color: var(--gold);">⭐</div>
       <div class="gamify-info">
-        <div class="gamify-label"><span id="hudLevel">Level 1</span></div>
+        <div class="gamify-label"><span id="hudLevel">רמה 1</span></div>
         <div class="gamify-val" id="hudXp">0 XP</div>
         <div class="progress-bar-outer"><div class="progress-bar-inner" id="hudXpBar"></div></div>
       </div>
@@ -148,62 +148,62 @@
       <div>
         <div class="card">
           <h2>
-            <span id="currentDayTitle">Plan</span>
-            <span id="weekPhaseBadge" class="badge badge-load">Empty State</span>
+            <span id="currentDayTitle">התוכנית להיום</span>
+            <span id="weekPhaseBadge" class="badge badge-load">שלב ריק</span>
           </h2>
           
           <div class="section-header">
-            <span class="section-title">Resistance Training</span>
-            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('resistance')">+ Add</button>
+            <span class="section-title">אימון התנגדות</span>
+            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('resistance')">+ הוסף</button>
           </div>
           <ul class="exercise-list" id="resistanceList"></ul>
 
           <div class="section-header" style="margin-top: 18px;">
-            <span class="section-title">Aerobic Session</span>
-            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('aerobic')">+ Add</button>
+            <span class="section-title">אימון אירובי</span>
+            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('aerobic')">+ הוסף</button>
           </div>
           <ul class="exercise-list" id="aerobicList"></ul>
 
           <div class="section-header" style="margin-top: 18px;">
-            <span class="section-title" style="color: var(--warning);">Daily Snack</span>
-            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('snack')">+ Add</button>
+            <span class="section-title" style="color: var(--warning);">חטיף יומי</span>
+            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('snack')">+ הוסף</button>
           </div>
           <ul class="exercise-list" id="snackList"></ul>
 
           <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--card-border);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <strong style="font-size: 0.9rem; color: #fff;">Progression Transition</strong>
-              <button class="btn btn-secondary btn-sm" onclick="reRollCurrentWeek()">🎲 Re-Roll Week</button>
+              <strong style="font-size: 0.9rem; color: #fff;">ניהול התקדמות שבועית</strong>
+              <button class="btn btn-secondary btn-sm" onclick="reRollCurrentWeek()">🎲 הגרל שבוע מחדש</button>
             </div>
-            <button class="btn btn-warning btn-sm" style="width: 100%;" onclick="advanceWeekWorkflow()">Complete & Advance Week ➔</button>
+            <button class="btn btn-warning btn-sm" style="width: 100%;" onclick="advanceWeekWorkflow()">🡠 השלם אימונים ומעבר לשבוע הבא</button>
           </div>
         </div>
       </div>
 
       <div>
         <div class="card">
-          <h2>Session Logging</h2>
+          <h2>רישום ביצוע אימונים</h2>
           <form onsubmit="handleLogSubmit(event)">
             
             <div id="sessionLoggers"></div>
 
             <div class="form-group" id="distanceField" style="display: none; background: rgba(52, 211, 153, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed var(--running); margin-top: 12px;">
-              <label style="color: var(--running);">Distance Completed (km)</label>
-              <input type="number" step="0.1" id="logDistance" placeholder="e.g. 3.5" />
+              <label style="color: var(--running);">מרחק ריצה / הליכה (בק"מ)</label>
+              <input type="number" step="0.1" id="logDistance" placeholder="לדוגמה: 3.5" />
             </div>
 
             <div class="form-group" style="margin-top:12px; background: rgba(244, 114, 182, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed var(--accent);">
               <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--accent); font-size: 0.95rem;">
                 <input type="checkbox" id="logCouples" style="width: 18px; height: 18px;" />
-                👩‍❤️‍👨 Couples Workout (+50 XP Bonus)
+                👩‍❤️‍👨 אימון זוגי משותף (+50 XP בונוס)
               </label>
             </div>
 
             <div class="form-group" style="margin-top:16px;">
-              <label>How did it feel? (Notes)</label>
-              <textarea id="logNotes" rows="2" placeholder="Felt great, pushed the KB press..."></textarea>
+              <label>איך הרגיש האימון? (הערות)</label>
+              <textarea id="logNotes" rows="2" placeholder="היה מעולה, משקל קצת כבד..."></textarea>
             </div>
-            <button type="submit" class="btn" style="width: 100%;">Save Log & Earn XP</button>
+            <button type="submit" class="btn" style="width: 100%;">שמור אימון וקבל נקודות XP</button>
           </form>
         </div>
       </div>
@@ -212,7 +212,7 @@
 
   <div id="achievementsView" style="display: none;">
     <div class="card">
-      <h2>Badges & Milestones</h2>
+      <h2>הישגים וציוני דרך</h2>
       <div class="achievements-grid" id="achievementsList"></div>
     </div>
   </div>
@@ -220,92 +220,92 @@
   <div id="databaseView" style="display: none;">
     <div class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2>Google Drive Sync</h2>
-        <button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset Progress</button>
+        <h2>סנכרון מול גוגל דרייב</h2>
+        <button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ איפוס התקדמות (Soft)</button>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Authenticate to sync data to Drive. <strong>Catalog</strong> syncs your exercises & blueprints. <strong>Progress</strong> syncs your weekly generated plan & gamification.</p>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">בצעי אימות מול גוגל כדי לסנכרן. <strong>קטלוג</strong> מסנכרן את התרגילים והתוכנית. <strong>התקדמות</strong> שומרת את האימונים והרצף שלך.</p>
       
       <div class="form-group" style="margin-bottom: 16px;">
-        <label>Google OAuth Client ID</label>
-        <input type="text" id="gcpClientId" placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com" />
-        <button class="btn btn-success btn-sm" style="margin-top: 6px; width: max-content;" onclick="saveClientId()">Save ID</button>
+        <label>מזהה לקוח (Client ID) של גוגל</label>
+        <input type="text" id="gcpClientId" placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com" dir="ltr" style="text-align: left;" />
+        <button class="btn btn-success btn-sm" style="margin-top: 6px; width: max-content;" onclick="saveClientId()">שמור מזהה</button>
       </div>
       
       <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-        <strong style="display: block; margin-bottom: 8px; font-size: 0.95rem; color: var(--primary);">1. Catalog & Blueprints</strong>
+        <strong style="display: block; margin-bottom: 8px; font-size: 0.95rem; color: var(--primary);">1. קטלוג תרגילים ותוכנית בסיס</strong>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button class="btn btn-primary btn-sm" onclick="authenticateDrive('push', 'catalog')">☁️ Push Catalog</button>
-          <button class="btn btn-primary btn-sm" onclick="authenticateDrive('pull', 'catalog')">⬇️ Pull Catalog</button>
-          <button class="btn btn-secondary btn-sm" onclick="loadDataFromClipboard()">Load JSON Manually</button>
+          <button class="btn btn-primary btn-sm" onclick="authenticateDrive('push', 'catalog')">☁️ שמור קטלוג לדרייב</button>
+          <button class="btn btn-primary btn-sm" onclick="authenticateDrive('pull', 'catalog')">⬇️ טען קטלוג מהדרייב</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadDataFromClipboard()">טעינת קוד JSON ידנית</button>
         </div>
       </div>
 
       <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px;">
-        <strong style="display: block; margin-bottom: 8px; font-size: 0.95rem; color: var(--success);">2. Training Progress & Active Plan</strong>
+        <strong style="display: block; margin-bottom: 8px; font-size: 0.95rem; color: var(--success);">2. ההתקדמות האישית שלך</strong>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button class="btn btn-success btn-sm" onclick="authenticateDrive('push', 'state')">☁️ Push Progress</button>
-          <button class="btn btn-success btn-sm" onclick="authenticateDrive('pull', 'state')">⬇️ Pull Progress</button>
+          <button class="btn btn-success btn-sm" onclick="authenticateDrive('push', 'state')">☁️ שמור התקדמות לדרייב</button>
+          <button class="btn btn-success btn-sm" onclick="authenticateDrive('pull', 'state')">⬇️ טען התקדמות מהדרייב</button>
         </div>
       </div>
 
       <div id="syncStatus" style="font-size: 0.85rem; margin-top: 12px; color: var(--warning);"></div>
-      <label style="margin-top: 16px; display: block;">Catalog JSON (Read/Write)</label>
-      <textarea id="jsonArea" rows="6" style="width: 100%; margin-top: 4px; font-family: monospace; font-size: 0.8rem;"></textarea>
+      <label style="margin-top: 16px; display: block;">קוד קטלוג (לקריאה/עריכה)</label>
+      <textarea id="jsonArea" rows="6" style="width: 100%; margin-top: 4px; font-family: monospace; font-size: 0.8rem;" dir="ltr" text-align="left"></textarea>
     </div>
   </div>
 
   <!-- DROPDOWN MODAL -->
   <div class="modal-backdrop" id="exerciseModal">
     <div class="modal">
-      <h2 id="modalTitle" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--primary);">Add / Edit Exercise</h2>
+      <h2 id="modalTitle" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--primary);">הוספה / עריכת תרגיל</h2>
       <form onsubmit="saveModalExercise(event)">
         <input type="hidden" id="modalType" />
         <input type="hidden" id="modalEditIndex" value="-1" />
         
         <div class="form-group">
-          <label>Select Required Category</label>
+          <label>בחירת קטגוריה</label>
           <select id="modalCategorySelect" onchange="populateGroupedDropdown()"></select>
         </div>
         
         <div class="form-group">
-          <label>Select Exercise</label>
+          <label>בחירת תרגיל</label>
           <select id="modalExerciseSelect" required></select>
         </div>
 
         <div class="form-group" style="margin-top: 8px; border-top: 1px solid var(--card-border); padding-top: 8px;">
-          <label>Prescription Math Model</label>
+          <label>שיטת אימון</label>
           <select id="modalPrescriptionType" onchange="togglePrescriptionFields()">
-            <option value="reps">Sets & Reps (Resistance)</option>
-            <option value="duration">Duration (Aerobic)</option>
-            <option value="intervals">Intervals (HIIT)</option>
+            <option value="reps">סטים וחזרות (כוח)</option>
+            <option value="duration">זמן כולל (אירובי)</option>
+            <option value="intervals">אינטרוולים (HIIT)</option>
           </select>
         </div>
 
         <div id="field_reps" class="form-row p-field">
-          <div class="form-group"><label>Sets</label><input type="number" id="modalRepSets" placeholder="e.g. 3" /></div>
-          <div class="form-group"><label>Reps</label><input type="number" id="modalRepCount" placeholder="e.g. 5" /></div>
-          <div class="form-group"><label>Rest (s)</label><input type="number" id="modalRepRest" placeholder="e.g. 60" /></div>
+          <div class="form-group"><label>סטים</label><input type="number" id="modalRepSets" placeholder="למשל: 3" /></div>
+          <div class="form-group"><label>חזרות</label><input type="number" id="modalRepCount" placeholder="למשל: 5" /></div>
+          <div class="form-group"><label>מנוחה (שניות)</label><input type="number" id="modalRepRest" placeholder="למשל: 60" /></div>
         </div>
         
         <div id="field_duration" class="form-group p-field" style="display:none;">
-          <label>Total Minutes</label>
-          <input type="number" id="modalMin" placeholder="e.g. 20" />
+          <label>סך הכל דקות</label>
+          <input type="number" id="modalMin" placeholder="למשל: 20" />
         </div>
 
         <div id="field_intervals" class="form-row p-field" style="display:none;">
-          <div class="form-group"><label>Rounds</label><input type="number" id="modalIntSets" placeholder="e.g. 5" /></div>
-          <div class="form-group"><label>Work (s)</label><input type="number" id="modalIntWork" placeholder="e.g. 60" /></div>
-          <div class="form-group"><label>Rest (s)</label><input type="number" id="modalIntRest" placeholder="e.g. 60" /></div>
+          <div class="form-group"><label>סיבובים</label><input type="number" id="modalIntSets" placeholder="למשל: 5" /></div>
+          <div class="form-group"><label>עבודה (שניות)</label><input type="number" id="modalIntWork" placeholder="למשל: 60" /></div>
+          <div class="form-group"><label>מנוחה (שניות)</label><input type="number" id="modalIntRest" placeholder="למשל: 60" /></div>
         </div>
         
         <div class="form-group" style="margin-top: 8px; border-top: 1px solid var(--card-border); padding-top: 8px;">
-          <label>Target Effort</label>
-          <input type="text" id="modalEffort" placeholder="e.g., Light, Moderate, Hard" required />
+          <label>מאמץ מטרה (יעד)</label>
+          <input type="text" id="modalEffort" placeholder="למשל: Easy, Medium, Hard" required />
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
-          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn">Save</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+          <button type="submit" class="btn">שמור שינויים</button>
         </div>
       </form>
     </div>
@@ -313,37 +313,37 @@
 
   <script>
     const DAYS = [
-      { id: "sun", name: "Sunday", short: "Sun" }, { id: "mon", name: "Monday", short: "Mon" },
-      { id: "tue", name: "Tuesday", short: "Tue" }, { id: "wed", name: "Wednesday", short: "Wed" },
-      { id: "thu", name: "Thursday", short: "Thu" }, { id: "fri", name: "Friday", short: "Fri" },
-      { id: "sat", name: "Saturday", short: "Sat" }
+      { id: "sun", name: "ראשון", short: "א'" }, { id: "mon", name: "שני", short: "ב'" },
+      { id: "tue", name: "שלישי", short: "ג'" }, { id: "wed", name: "רביעי", short: "ד'" },
+      { id: "thu", name: "חמישי", short: "ה'" }, { id: "fri", name: "שישי", short: "ו'" },
+      { id: "sat", name: "שבת", short: "ש'" }
     ];
 
     const ACHIEVEMENTS_DATA = [
-      { id: "log_bronze", icon: "🥉", title: "Starter Log", desc: "1 Session Logged" },
-      { id: "log_silver", icon: "🥈", title: "Regular", desc: "10 Sessions Logged" },
-      { id: "log_gold", icon: "🥇", title: "Dedicated", desc: "25 Sessions Logged" },
-      { id: "log_plat", icon: "💎", title: "Unstoppable", desc: "50 Sessions Logged" },
+      { id: "log_bronze", icon: "🥉", title: "צעד ראשון", desc: "אימון 1 נרשם" },
+      { id: "log_silver", icon: "🥈", title: "מתמידה", desc: "10 אימונים נרשמו" },
+      { id: "log_gold", icon: "🥇", title: "מקצוענית", desc: "25 אימונים נרשמו" },
+      { id: "log_plat", icon: "💎", title: "בלתי ניתנת לעצירה", desc: "50 אימונים נרשמו" },
 
-      { id: "snack_bronze", icon: "🍏", title: "Snacker (Br)", desc: "1 Snack Logged" },
-      { id: "snack_silver", icon: "🍎", title: "Snacker (Sv)", desc: "10 Snacks Logged" },
-      { id: "snack_gold", icon: "🥞", title: "Snacker (Au)", desc: "25 Snacks Logged" },
-      { id: "snack_plat", icon: "🍱", title: "Snacker (Pt)", desc: "50 Snacks Logged" },
+      { id: "snack_bronze", icon: "🍏", title: "חטיף (ארד)", desc: "חטיף יומי 1" },
+      { id: "snack_silver", icon: "🍎", title: "חטיף (כסף)", desc: "10 חטיפים" },
+      { id: "snack_gold", icon: "🥞", title: "חטיף (זהב)", desc: "25 חטיפים" },
+      { id: "snack_plat", icon: "🍱", title: "חטיף (פלטינום)", desc: "50 חטיפים" },
 
-      { id: "streak_bronze", icon: "🔥", title: "Iron Habit", desc: "7-Day Streak" },
-      { id: "streak_silver", icon: "🔥", title: "Steel Habit", desc: "14-Day Streak" },
-      { id: "streak_gold", icon: "🔥", title: "Titanium Habit", desc: "30-Day Streak" },
-      { id: "streak_plat", icon: "🔥", title: "Diamond Habit", desc: "60-Day Streak" },
+      { id: "streak_bronze", icon: "🔥", title: "הרגל מברזל", desc: "רצף 7 ימים" },
+      { id: "streak_silver", icon: "🔥", title: "הרגל מפלדה", desc: "רצף 14 ימים" },
+      { id: "streak_gold", icon: "🔥", title: "הרגל מטיטניום", desc: "רצף 30 ימים" },
+      { id: "streak_plat", icon: "🔥", title: "הרגל מיהלום", desc: "רצף 60 ימים" },
 
-      { id: "couples_bronze", icon: "🥉", title: "Dynamic Duo", desc: "1 Couples Workout" },
-      { id: "couples_silver", icon: "🥈", title: "Dynamic Duo", desc: "5 Couples Workouts" },
-      { id: "couples_gold", icon: "🥇", title: "Dynamic Duo", desc: "10 Couples Workouts" },
-      { id: "couples_plat", icon: "💎", title: "Dynamic Duo", desc: "25 Couples Workouts" },
+      { id: "couples_bronze", icon: "🥉", title: "הצמד הדינמי", desc: "אימון זוגי 1" },
+      { id: "couples_silver", icon: "🥈", title: "הצמד הדינמי", desc: "5 אימונים זוגיים" },
+      { id: "couples_gold", icon: "🥇", title: "הצמד הדינמי", desc: "10 אימונים זוגיים" },
+      { id: "couples_plat", icon: "💎", title: "הצמד הדינמי", desc: "25 אימונים זוגיים" },
 
-      { id: "comp_bronze", icon: "🎯", title: "Targeted (Br)", desc: ">70% Compliance" },
-      { id: "comp_silver", icon: "🎯", title: "Targeted (Sv)", desc: ">80% Compliance" },
-      { id: "comp_gold", icon: "🎯", title: "Targeted (Au)", desc: ">90% Compliance" },
-      { id: "comp_plat", icon: "🎯", title: "Perfect Form", desc: "100% Compliance (10+ logs)" }
+      { id: "comp_bronze", icon: "🎯", title: "מדויקת (ארד)", desc: "70% עמידה במאמץ" },
+      { id: "comp_silver", icon: "🎯", title: "מדויקת (כסף)", desc: "80% עמידה במאמץ" },
+      { id: "comp_gold", icon: "🎯", title: "מדויקת (זהב)", desc: "90% עמידה במאמץ" },
+      { id: "comp_plat", icon: "🎯", title: "שלמות", desc: "100% (מינימום 10 אימונים)" }
     ];
 
     let appData = JSON.parse(localStorage.getItem("health_tracker_app_data"));
@@ -377,9 +377,16 @@
     function parseEffort(effortStr) {
         if (!effortStr) return 2; // Default Moderate
         const e = effortStr.toLowerCase();
-        if (e.includes("easy") || e.includes("light") || e.includes("green")) return 1;
-        if (e.includes("hard") || e.includes("max") || e.includes("red")) return 3;
+        if (e.includes("easy") || e.includes("light") || e.includes("green") || e.includes("קל")) return 1;
+        if (e.includes("hard") || e.includes("max") || e.includes("red") || e.includes("קשה")) return 3;
         return 2;
+    }
+    
+    function translateEffort(effortStr) {
+        let val = parseEffort(effortStr);
+        if (val === 1) return 'קל';
+        if (val === 3) return 'קשה';
+        return 'בינוני';
     }
 
     function getEffortStyle(val) {
@@ -400,24 +407,24 @@
     }
 
     function factoryReset() {
-      if (confirm("⚠️ WARNING: This will permanently delete your logs, XP, and streaks to let you start fresh. Your weekly plans and blueprints will remain perfectly intact. Proceed?")) {
+      if (confirm("⚠️ אזהרה: פעולה זו תמחק לצמיתות את היומן, הנקודות והרצפים שלך ותאפשר לך להתחיל מחדש. התוכניות והקטלוג ישמרו ללא שינוי. להמשיך?")) {
         state.logs = {};
         state.gamify = { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [], totalSessionsCount: 0, compliantSessionsCount: 0, snackCount: 0 };
         saveState();
         init();
-        alert("Progress reset. Your training plan remains intact.");
+        alert("ההתקדמות אופסה. התוכניות השבועיות נשמרו בהצלחה.");
       }
     }
 
     window.reRollCurrentWeek = function() {
-      if (confirm("🎲 Re-randomize this week's plan? Logged sessions will be preserved.")) {
+      if (confirm("🎲 האם להגריל מחדש את אימוני השבוע? (אימונים שכבר ביצעת השבוע לא יימחקו).")) {
         const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
         delete state.generatedPlans[planKey];
         saveState();
         ensurePlanExists(state.currentCycle, state.currentWeek);
         renderDaySelector();
         renderDayView();
-        alert("Current week successfully re-rolled!");
+        alert("השבוע הוגרל מחדש בהצלחה!");
       }
     }
 
@@ -438,7 +445,6 @@
           const usedIds = new Set();
           if(plan.days[dayId][type]) {
             plan.days[dayId][type].forEach(slot => {
-               // מנוע ההגרלות המעודכן - יודע לשלוף חטיפים מהמאגר הראשי
                let candidates = Object.keys(catalog).filter(id => {
                    let cat = catalog[id];
                    let matchType = (cat.type === type) || (type === 'snack' && (cat.type === 'resistance' || cat.type === 'aerobic'));
@@ -465,21 +471,21 @@
 
     function formatPrescription(p) {
       if (!p) return "";
-      if (p.type === 'duration') return `${p.minutes} mins`;
-      if (p.type === 'intervals') return `${p.sets} rounds: ${p.work_sec}s work / ${p.rest_sec}s rest`;
-      if (p.type === 'reps') return `${p.sets} x ${p.reps} reps @ ${p.rest_sec}s rest`;
-      return "Manage on go";
+      if (p.type === 'duration') return `${p.minutes} דקות`;
+      if (p.type === 'intervals') return `${p.sets} סיבובים: ${p.work_sec}ש עבודה / ${p.rest_sec}ש מנוחה`;
+      if (p.type === 'reps') return `${p.sets} סטים x ${p.reps} חזרות @ ${p.rest_sec}ש מנוחה`;
+      return "לפי הרגשה";
     }
 
     function updateDynamicWeekButtons() {
-      document.getElementById("cycleLabel").innerText = `C${state.currentCycle}:`;
+      document.getElementById("cycleLabel").innerText = `מחזור ${state.currentCycle}:`;
       const container = document.getElementById("dynamicWeekButtons");
       container.innerHTML = "";
       const displayCount = 6;
       for (let w = 1; w <= displayCount; w++) {
         const btn = document.createElement("button");
         btn.className = `cycle-btn ${w === state.currentWeek ? "active" : ""}`;
-        btn.innerText = `W${w}`;
+        btn.innerText = `שבוע ${w}`;
         btn.onclick = () => selectWeek(w);
         container.appendChild(btn);
       }
@@ -508,15 +514,15 @@
 
     function renderHUD() {
       const g = state.gamify;
-      document.getElementById("hudStreak").innerText = `${g.streak} Day${g.streak === 1 ? '' : 's'}`;
+      document.getElementById("hudStreak").innerText = `${g.streak} ימים`;
       document.getElementById("hudShields").innerText = `${g.shields} / 3`;
-      document.getElementById("hudCouples").innerText = `${g.couplesCount || 0} Logged`;
+      document.getElementById("hudCouples").innerText = `${g.couplesCount || 0} נרשמו`;
       
       let comp = g.totalSessionsCount > 0 ? Math.round((g.compliantSessionsCount / g.totalSessionsCount) * 100) : 0;
       document.getElementById("hudCompliance").innerText = `${comp}%`;
 
       const level = Math.floor(g.xp / 400) + 1;
-      document.getElementById("hudLevel").innerText = `Level ${level}`;
+      document.getElementById("hudLevel").innerText = `רמה ${level}`;
       document.getElementById("hudXp").innerText = `${g.xp} XP`;
       document.getElementById("hudXpBar").style.width = `${Math.min(100, ((g.xp % 400) / 400) * 100)}%`;
     }
@@ -560,40 +566,40 @@
         let targetSum = 0; let targetCount = 0;
         dayData[key].forEach(ex => { targetSum += parseEffort(ex.effort); targetCount++; });
         let sessionTargetNum = targetCount > 0 ? Math.round(targetSum / targetCount) : 2;
-        let targetWord = sessionTargetNum === 1 ? '🟢 Light' : (sessionTargetNum === 3 ? '🔴 Hard' : '🟡 Moderate');
+        let targetWord = sessionTargetNum === 1 ? '🟢 קל' : (sessionTargetNum === 3 ? '🔴 קשה' : '🟡 בינוני');
 
         const statusVal = statuses[key] || "completed";
         const colorVal = colors[key] || "";
         
         container.innerHTML += `
-          <div class="form-group" style="border-left: 2px solid var(--primary); padding-left: 10px; margin-bottom: 12px; background: rgba(30, 27, 75, 0.4); padding: 10px; border-radius: 6px;">
+          <div class="form-group" style="border-right: 2px solid var(--primary); padding-right: 10px; margin-bottom: 12px; background: rgba(30, 27, 75, 0.4); padding: 10px; border-radius: 6px;">
             <label style="color: #fff; font-size: 0.95rem; margin-bottom: 2px;">${label}</label>
-            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Target: ${targetWord}</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">רמת קושי מתוכננת: ${targetWord}</span>
             <div style="display: flex; gap: 10px; margin-bottom: 8px;">
                 <select id="status_${key}" style="flex: 1; border-color: var(--primary);">
-                  <option value="completed" ${statusVal==='completed'?'selected':''}>Completed</option>
-                  <option value="modified" ${statusVal==='modified'?'selected':''}>Modified</option>
-                  <option value="missed" ${statusVal==='missed'?'selected':''}>Missed / Skipped</option>
+                  <option value="completed" ${statusVal==='completed'?'selected':''}>בוצע בהצלחה</option>
+                  <option value="modified" ${statusVal==='modified'?'selected':''}>בוצע בשינויים</option>
+                  <option value="missed" ${statusVal==='missed'?'selected':''}>לא בוצע / דלגתי</option>
                 </select>
             </div>
             <input type="hidden" id="color_val_${key}" value="${colorVal}" />
             <div class="color-picker" id="rpe_container_${key}">
-              <div id="btn_${key}_green" class="color-btn green btn-${key} ${colorVal==='green'?'selected':''}" onclick="selectColor('${key}', 'green')">🟢 Light</div>
-              <div id="btn_${key}_yellow" class="color-btn yellow btn-${key} ${colorVal==='yellow'?'selected':''}" onclick="selectColor('${key}', 'yellow')">🟡 Mod</div>
-              <div id="btn_${key}_red" class="color-btn red btn-${key} ${colorVal==='red'?'selected':''}" onclick="selectColor('${key}', 'red')">🔴 Hard</div>
+              <div id="btn_${key}_green" class="color-btn green btn-${key} ${colorVal==='green'?'selected':''}" onclick="selectColor('${key}', 'green')">🟢 קל</div>
+              <div id="btn_${key}_yellow" class="color-btn yellow btn-${key} ${colorVal==='yellow'?'selected':''}" onclick="selectColor('${key}', 'yellow')">🟡 בינוני</div>
+              <div id="btn_${key}_red" class="color-btn red btn-${key} ${colorVal==='red'?'selected':''}" onclick="selectColor('${key}', 'red')">🔴 קשה</div>
             </div>
           </div>
         `;
       };
 
-      renderLogger('resistance', 'Resistance Session');
-      renderLogger('aerobic', 'Aerobic / Cardio');
-      renderLogger('snack', 'Daily Snack');
+      renderLogger('resistance', 'אימון התנגדות');
+      renderLogger('aerobic', 'אירובי / אינטרוולים');
+      renderLogger('snack', 'חטיף יומי');
 
       document.getElementById("distanceField").style.display = hasAerobic ? "block" : "none";
 
       if (!hasScheduled) {
-        container.innerHTML = `<div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Rest Day. Maintain your habit by saving the log!</div>`;
+        container.innerHTML = `<div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">יום מנוחה מתוכנן. שמרי על ההרגל ושמרי את היומן בכל מקרה!</div>`;
       }
     }
 
@@ -605,9 +611,18 @@
       const dayData = plan.days[state.currentDay] || { resistance: [], aerobic: [], snack: [] };
       const existingLog = state.logs[`${planKey}_${state.currentDay}`];
 
-      document.getElementById("currentDayTitle").innerText = `${DAYS.find(d => d.id === state.currentDay).name} Plan`;
+      document.getElementById("currentDayTitle").innerText = `התוכנית ליום ${DAYS.find(d => d.id === state.currentDay).name}`;
       document.getElementById("weekPhaseBadge").className = `badge ${plan.badge}`;
-      document.getElementById("weekPhaseBadge").innerText = plan.phaseName;
+      
+      let phaseHebrew = plan.phaseName;
+      if(phaseHebrew.includes("Week 1")) phaseHebrew = "שבוע 1: כיול בסיס (5 ק״ג)";
+      if(phaseHebrew.includes("Week 2")) phaseHebrew = "שבוע 2: התקדמות (5 ק״ג)";
+      if(phaseHebrew.includes("Week 3")) phaseHebrew = "שבוע 3: שיא הנפח (5 ק״ג)";
+      if(phaseHebrew.includes("Week 4")) phaseHebrew = "שבוע 4: מקסימום חזרות (5 ק״ג)";
+      if(phaseHebrew.includes("Week 5")) phaseHebrew = "שבוע 5: שיא משקל (8 ק״ג תחתון)";
+      if(phaseHebrew.includes("Week 6")) phaseHebrew = "שבוע 6: דילואוד והתאוששות";
+
+      document.getElementById("weekPhaseBadge").innerText = phaseHebrew;
 
       renderExerciseList("resistance", dayData.resistance || []);
       renderExerciseList("aerobic", dayData.aerobic || []);
@@ -628,20 +643,30 @@
     function renderExerciseList(type, list) {
       const catalog = appData.exercise_catalog || {};
       document.getElementById(`${type}List`).innerHTML = list.map((item, index) => {
-        if (!item.exerciseId || !catalog[item.exerciseId]) return `<li class="exercise-item"><div><strong>No matching exercise found</strong></div></li>`;
+        if (!item.exerciseId || !catalog[item.exerciseId]) return `<li class="exercise-item"><div><strong>לא נמצא תרגיל מתאים בקטלוג</strong></div></li>`;
         const entry = catalog[item.exerciseId];
         
         let effortVal = parseEffort(item.effort);
-        let effortHtml = `<span class="meta" style="${getEffortStyle(effortVal)} display: inline-block; margin-top: 4px;">Target: ${item.effort || 'Moderate'}</span>`;
+        let effortHtml = `<span class="meta" style="${getEffortStyle(effortVal)} display: inline-block; margin-top: 4px;">יעד: ${translateEffort(item.effort)}</span>`;
+
+        let catNameHebrew = item.category.toUpperCase().replace("_"," ");
+        if(item.category === "lower_body") catNameHebrew = "פלג גוף תחתון";
+        if(item.category === "upper_body") catNameHebrew = "פלג גוף עליון";
+        if(item.category === "power") catNameHebrew = "כוח מתפרץ";
+        if(item.category === "core") catNameHebrew = "ליבה";
+        if(item.category === "strength") catNameHebrew = "כוח";
+        if(item.category === "walk") catNameHebrew = "הליכה";
+        if(item.category === "run") catNameHebrew = "ריצה";
+        if(item.category === "cardio") catNameHebrew = "אירובי";
 
         return `
           <li class="exercise-item">
             <div>
               <strong style="font-size: 1rem;">${entry.name}</strong>
-              <span class="meta" style="color:var(--accent); font-weight:600; display:block;">${item.category.toUpperCase().replace("_"," ")}</span>
+              <span class="meta" style="color:var(--accent); font-weight:600; display:block;">${catNameHebrew}</span>
               <span class="meta" style="color: #fff; margin-bottom: 2px;">${formatPrescription(item.prescription)}</span>
               ${effortHtml}
-              ${entry.equipment && entry.equipment !== 'None' ? `<span class="meta" style="margin-top:4px;">• ${entry.equipment}</span>` : ''}
+              ${entry.equipment && entry.equipment !== 'None' ? `<span class="meta" style="margin-top:4px;">• ציוד: ${entry.equipment}</span>` : ''}
               ${entry.notes ? `<span class="meta" style="font-style:italic;">${entry.notes}</span>` : ''}
             </div>
             <div class="item-actions">
@@ -707,11 +732,11 @@
         if (state.gamify.shields > 0) {
           if (isNewLog) state.gamify.shields -= 1;
           sessionStatus.overall = "shielded";
-          alert("🛡️ Streak Shield Activated! Your streak is safe.");
+          alert("🛡️ מגן רצף הופעל! שמרת על הרצף שלך למרות הפספוס.");
         } else {
           state.gamify.streak = 0;
           sessionStatus.overall = "missed";
-          alert("⚠️ Streak Reset! 0 shields left.");
+          alert("⚠️ הרצף התאפס! לא נותרו לך מגני רצף.");
         }
       } else {
         if (isNewLog) {
@@ -720,9 +745,9 @@
           if (state.gamify.streak > 0 && state.gamify.streak % 7 === 0) {
             if (state.gamify.shields < 3) {
               state.gamify.shields += 1;
-              alert("🛡️ 7-Day Streak! You earned a Streak Shield!");
+              alert("🛡️ רצף של 7 ימים! הרווחת מגן רצף חדש.");
             } else {
-              alert("🔥 7-Day Streak! (Shields are full at 3/3)");
+              alert("🔥 רצף של 7 ימים! (מגני הרצף שלך מלאים ב-3/3).");
             }
           }
           
@@ -742,7 +767,7 @@
           checkAllBadges();
 
           if (complianceMatches > 0) {
-              alert(`🎯 Perfect compliance! +${complianceMatches * 15} XP Bonus!`);
+              alert(`🎯 עמידה מושלמת ביעד הקושי! קיבלת בונוס +${complianceMatches * 15} XP!`);
           }
         }
         sessionStatus.overall = "completed";
@@ -786,7 +811,7 @@
 
     function advanceWeekWorkflow() {
       if (state.currentWeek >= 6) {
-        if (confirm(`Conclude Cycle ${state.currentCycle}?`)) {
+        if (confirm(`האם ברצונך לסיים את מחזור ${state.currentCycle}?`)) {
           state.currentCycle++; state.currentWeek = 1; state.gamify.xp += 200;
         }
       } else {
@@ -819,14 +844,25 @@
       const catalog = appData.exercise_catalog || {};
       const categories = new Set();
       Object.values(catalog).forEach(ex => { 
-          // מנוע התפריט - מאפשר שליפת קטגוריות למשבצות חטיף
           if (ex.type === type || (type === 'snack' && (ex.type === 'resistance' || ex.type === 'aerobic'))) {
               categories.add(ex.category); 
           }
       });
       Array.from(categories).sort().forEach(cat => {
         const opt = document.createElement("option");
-        opt.value = cat; opt.innerText = cat.replace("_", " ").toUpperCase();
+        opt.value = cat; 
+        
+        let catHebrew = cat.replace("_", " ").toUpperCase();
+        if(cat === "lower_body") catHebrew = "פלג גוף תחתון";
+        if(cat === "upper_body") catHebrew = "פלג גוף עליון";
+        if(cat === "power") catHebrew = "כוח מתפרץ";
+        if(cat === "core") catHebrew = "ליבה";
+        if(cat === "strength") catHebrew = "כוח";
+        if(cat === "walk") catHebrew = "הליכה";
+        if(cat === "run") catHebrew = "ריצה";
+        if(cat === "cardio") catHebrew = "אירובי";
+        
+        opt.innerText = catHebrew;
         if (cat === selectedCategory) opt.selected = true;
         select.appendChild(opt);
       });
@@ -837,7 +873,7 @@
       const type = document.getElementById("modalType").value;
       const category = document.getElementById("modalCategorySelect").value;
       const select = document.getElementById("modalExerciseSelect");
-      select.innerHTML = `<option value="" disabled ${!selectedId ? 'selected' : ''}>-- Choose Exercise --</option>`;
+      select.innerHTML = `<option value="" disabled ${!selectedId ? 'selected' : ''}>-- בחר תרגיל --</option>`;
       const catalog = appData.exercise_catalog || {};
       Object.entries(catalog).forEach(([id, ex]) => {
         let isTypeMatch = (ex.type === type) || (type === 'snack' && (ex.type === 'resistance' || ex.type === 'aerobic'));
@@ -859,7 +895,7 @@
     function openAddExerciseModal(type) {
       document.getElementById("modalType").value = type;
       document.getElementById("modalEditIndex").value = "-1";
-      document.getElementById("modalTitle").innerText = `Add to ${type.toUpperCase()}`;
+      document.getElementById("modalTitle").innerText = `הוספת תרגיל חדש`;
       
       document.getElementById("modalPrescriptionType").value = "reps";
       document.getElementById("modalRepSets").value = "";
@@ -880,7 +916,7 @@
       
       document.getElementById("modalType").value = type;
       document.getElementById("modalEditIndex").value = index;
-      document.getElementById("modalTitle").innerText = `Edit ${type.toUpperCase()}`;
+      document.getElementById("modalTitle").innerText = `עריכת תרגיל`;
       document.getElementById("modalEffort").value = item.effort || "Moderate";
       
       populateCategoryDropdown(type, item.category);
@@ -949,8 +985,8 @@
         appData = JSON.parse(document.getElementById("jsonArea").value); 
         localStorage.setItem("health_tracker_app_data", JSON.stringify(appData));
         init(); 
-        alert("Catalog loaded! If your generated plan disappeared, it was wiped to safely update to the new version format."); 
-      } catch(e) { alert("Invalid JSON format."); }
+        alert("הקטלוג נטען בהצלחה מתוך תיבת הטקסט!"); 
+      } catch(e) { alert("פורמט JSON לא חוקי. אנא בדוק את הקוד."); }
     }
 
     const SCOPES = 'https://www.googleapis.com/auth/drive.file';
@@ -960,7 +996,7 @@
 
     function saveClientId() {
       const id = document.getElementById("gcpClientId").value.trim();
-      if(id) { localStorage.setItem("health_gdrive_client_id", id); alert("Client ID Saved."); }
+      if(id) { localStorage.setItem("health_gdrive_client_id", id); alert("מזהה (Client ID) נשמר בהצלחה."); }
     }
 
     function updateSyncStatus(msg, isError=false) {
@@ -970,14 +1006,14 @@
 
     function authenticateDrive(action, target) {
       const clientId = localStorage.getItem("health_gdrive_client_id");
-      if (!clientId) return updateSyncStatus("Please enter your Google Client ID first.", true);
-      updateSyncStatus(`Authenticating with Google for ${target}...`);
+      if (!clientId) return updateSyncStatus("אנא הזן Client ID לפני הסנכרון.", true);
+      updateSyncStatus(`מבצע אימות מול גוגל עבור ${target}...`);
       pendingAction = action;
       pendingTarget = target;
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: clientId, scope: SCOPES,
         callback: (response) => {
-          if (response.error) updateSyncStatus("Authentication failed.", true);
+          if (response.error) updateSyncStatus("אימות נכשל.", true);
           else {
               if (pendingAction === 'push') executePush(response.access_token, pendingTarget);
               else if (pendingAction === 'pull') executePull(response.access_token, pendingTarget);
@@ -989,7 +1025,7 @@
 
     async function executePush(token, target) {
       const fileName = target === 'catalog' ? 'health_tracker_catalog.json' : 'health_tracker_state.json';
-      updateSyncStatus(`Uploading ${target} to Drive...`);
+      updateSyncStatus(`מעלה את ${target} לדרייב...`);
       try {
         const query = encodeURIComponent(`name='${fileName}' and trashed=false`);
         const listRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id)`, { headers: { Authorization: `Bearer ${token}` }});
@@ -1011,20 +1047,20 @@
           const fileId = listData.files[0].id;
           await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: buildPayload() });
         }
-        updateSyncStatus(`✓ Successfully Pushed ${target} (${new Date().toLocaleTimeString()})`);
+        updateSyncStatus(`✓ נשמר לדרייב בהצלחה (${new Date().toLocaleTimeString()})`);
       } catch (err) { updateSyncStatus(`Upload Error: ${err.message}`, true); }
     }
 
     async function executePull(token, target) {
       const fileName = target === 'catalog' ? 'health_tracker_catalog.json' : 'health_tracker_state.json';
-      updateSyncStatus(`Downloading ${target} from Drive...`);
+      updateSyncStatus(`מוריד את ${target} מהדרייב...`);
       try {
         const query = encodeURIComponent(`name='${fileName}' and trashed=false`);
         const listRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id)`, { headers: { Authorization: `Bearer ${token}` }});
         const listData = await listRes.json();
 
         if (!listData.files || listData.files.length === 0) {
-            return updateSyncStatus(`No ${target} found on Drive. Push to Drive first.`, true);
+            return updateSyncStatus(`לא נמצא קובץ בדרייב. יש לבצע שמירה לדרייב קודם.`, true);
         }
 
         const fileId = listData.files[0].id;
@@ -1050,7 +1086,7 @@
         }
 
         init();
-        updateSyncStatus(`✓ Successfully Pulled ${target} (${new Date().toLocaleTimeString()})`);
+        updateSyncStatus(`✓ נטען מהדרייב בהצלחה (${new Date().toLocaleTimeString()})`);
       } catch (err) { updateSyncStatus(`Download Error: ${err.message}`, true); }
     }
 
