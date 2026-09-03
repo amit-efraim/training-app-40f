@@ -14,7 +14,7 @@
       --gold: #fbbf24; --fire: #f97316;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; max-width: 1250px; margin: 0 auto; }
+    body { background-color: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; max-width: 1250px; margin: 0 auto; direction: ltr; }
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--card-border); flex-wrap: wrap; gap: 12px; }
     h1 { font-size: 1.35rem; color: var(--primary); }
     .gamify-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
@@ -221,7 +221,7 @@
     <div class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h2>Google Drive Sync</h2>
-        <button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset Progress (Soft)</button>
+        <button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset Progress</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Authenticate to sync data to Drive. <strong>Catalog</strong> syncs your exercises & blueprints. <strong>Progress</strong> syncs your weekly generated plan & gamification.</p>
       
@@ -438,9 +438,13 @@
           const usedIds = new Set();
           if(plan.days[dayId][type]) {
             plan.days[dayId][type].forEach(slot => {
-               let candidates = Object.keys(catalog).filter(id => catalog[id].type === type && catalog[id].category === slot.category);
-               let nonExcluded = candidates.filter(id => !catalog[id].excludeFromRandom);
-               if (nonExcluded.length > 0) candidates = nonExcluded;
+               // מנוע ההגרלות המעודכן - יודע לשלוף חטיפים מהמאגר הראשי
+               let candidates = Object.keys(catalog).filter(id => {
+                   let cat = catalog[id];
+                   let matchType = (cat.type === type) || (type === 'snack' && (cat.type === 'resistance' || cat.type === 'aerobic'));
+                   return matchType && cat.category === slot.category && !cat.excludeFromRandom;
+               });
+               
                let unused = candidates.filter(id => !usedIds.has(id));
                if (unused.length > 0) candidates = unused;
                
@@ -814,7 +818,12 @@
       select.innerHTML = "";
       const catalog = appData.exercise_catalog || {};
       const categories = new Set();
-      Object.values(catalog).forEach(ex => { if (ex.type === type) categories.add(ex.category); });
+      Object.values(catalog).forEach(ex => { 
+          // מנוע התפריט - מאפשר שליפת קטגוריות למשבצות חטיף
+          if (ex.type === type || (type === 'snack' && (ex.type === 'resistance' || ex.type === 'aerobic'))) {
+              categories.add(ex.category); 
+          }
+      });
       Array.from(categories).sort().forEach(cat => {
         const opt = document.createElement("option");
         opt.value = cat; opt.innerText = cat.replace("_", " ").toUpperCase();
@@ -831,7 +840,8 @@
       select.innerHTML = `<option value="" disabled ${!selectedId ? 'selected' : ''}>-- Choose Exercise --</option>`;
       const catalog = appData.exercise_catalog || {};
       Object.entries(catalog).forEach(([id, ex]) => {
-        if (ex.type === type && ex.category === category) {
+        let isTypeMatch = (ex.type === type) || (type === 'snack' && (ex.type === 'resistance' || ex.type === 'aerobic'));
+        if (isTypeMatch && ex.category === category) {
           const opt = document.createElement("option");
           opt.value = id; opt.innerText = ex.name;
           if (id === selectedId) opt.selected = true;
