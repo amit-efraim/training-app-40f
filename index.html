@@ -3,311 +3,231 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>מעקב בריאות וחיוניות</title>
+  <title>יומן בריאות וחיוניות</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
-      --bg: #1e1b4b; --card-bg: #312e81; --card-border: #4338ca;
-      --primary: #c084fc; --primary-hover: #a855f7; --accent: #f472b6;
-      --running: #34d399; --text: #f8fafc; --text-muted: #cbd5e1;
-      --success: #22c55e; --warning: #eab308; --danger: #ef4444;
-      --gold: #fbbf24; --fire: #f97316;
+      --bg: #0f172a; --card-bg: #1e293b; --card-border: #334155;
+      --easy: #22c55e; --mod: #eab308; --hard: #ef4444; 
+      --text: #f8fafc; --text-muted: #94a3b8; --gold: #fbbf24;
+      --silver: #94a3b8; --bronze: #b45309; --plat: #38bdf8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; max-width: 1250px; margin: 0 auto; }
+    body { background-color: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; max-width: 1100px; margin: 0 auto; }
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--card-border); flex-wrap: wrap; gap: 12px; }
-    h1 { font-size: 1.35rem; color: var(--primary); }
-    .gamify-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
-    .gamify-stat { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
-    .gamify-icon { font-size: 1.8rem; line-height: 1; }
-    .gamify-info { flex: 1; }
-    .gamify-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; }
-    .gamify-val { font-size: 1.2rem; font-weight: 800; color: #fff; }
-    .progress-bar-outer { background: #1e1b4b; border-radius: 999px; height: 7px; width: 100%; margin-top: 5px; overflow: hidden; border: 1px solid var(--card-border); }
-    .progress-bar-inner { background: linear-gradient(270deg, var(--primary), var(--accent)); height: 100%; width: 0%; transition: width 0.4s ease; }
-    .nav-tabs { display: flex; gap: 8px; }
+    h1 { font-size: 1.35rem; color: #fff; }
+    
+    .nav-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
     .tab-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-    .tab-btn.active { background: var(--primary); color: #1e1b4b; border-color: var(--primary); }
+    .tab-btn.active { background: #fff; color: #0f172a; border-color: #fff; }
+    
     .cycle-control { display: flex; gap: 6px; align-items: center; background: var(--card-bg); padding: 5px 8px; border-radius: 8px; border: 1px solid var(--card-border); }
     .cycle-btn { background: transparent; border: 1px solid var(--card-border); color: var(--text); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
-    .cycle-btn.active { background: var(--primary); color: #1e1b4b; border-color: var(--primary); }
-    .badge { display: inline-block; padding: 3px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    .badge-load { background: #4c1d95; color: #c4b5fd; }
-    .badge-deload { background: #064e3b; color: #86efac; }
-    .badge-peak { background: #831843; color: #fbcfe8; }
+    .cycle-btn.active { background: #fff; color: #0f172a; border-color: #fff; }
+    
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+    .card h2 { font-size: 1.15rem; margin-bottom: 14px; color: #fff; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; }
+
+    /* Blueprint HUD */
+    .blueprint-hud { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .bp-stat { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; transition: opacity 0.3s; }
+    .bp-stat.completed { opacity: 0.4; filter: grayscale(80%); }
+    .bp-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
+    .bp-bar-bg { background: #0f172a; border-radius: 999px; height: 8px; width: 100%; overflow: hidden; border: 1px solid var(--card-border); }
+    .bp-bar-fill { height: 100%; transition: width 0.4s ease; }
+    .bp-snack .bp-header { color: var(--easy); } .bp-snack .bp-bar-fill { background: var(--easy); }
+    .bp-aero .bp-header { color: var(--mod); } .bp-aero .bp-bar-fill { background: var(--mod); }
+    .bp-res .bp-header { color: var(--hard); } .bp-res .bp-bar-fill { background: var(--hard); }
+
+    /* Day Selector */
     .day-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
     .day-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text); padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; }
-    .day-btn.active { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
+    .day-btn.active { border-color: #fff; box-shadow: 0 0 0 1px #fff; }
     .day-btn .status-dot { width: 8px; height: 8px; border-radius: 50%; margin: 4px auto 0; background: var(--card-border); }
-    .day-btn.completed .status-dot { background: var(--success); }
-    .day-btn.shielded .status-dot { background: var(--primary); }
-    .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } .day-selector { grid-template-columns: repeat(4, 1fr); } }
-    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
-    .card h2 { font-size: 1.15rem; margin-bottom: 10px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 14px 0 6px; }
-    .section-title { font-size: 0.9rem; font-weight: 700; color: var(--accent); text-transform: uppercase; }
-    .exercise-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-    .exercise-item { background: rgba(30, 27, 75, 0.6); padding: 9px 12px; border-radius: 6px; border-right: 3px solid var(--primary); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
-    .exercise-item .meta { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 4px; }
-    .item-actions button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; margin-right: 6px; font-size: 0.85rem; }
-    .item-actions button:hover { color: var(--text); }
-    .item-actions button.del:hover { color: var(--danger); }
-    .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-    label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
-    select, input, textarea { background: #1e1b4b; border: 1px solid var(--card-border); color: var(--text); padding: 8px 10px; border-radius: 6px; outline: none; }
-    .btn { background: var(--primary); color: #1e1b4b; border: none; padding: 9px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; }
-    .btn-secondary { background: #4f46e5; color: #fff; }
-    .btn-warning { background: var(--warning); color: #1e1b4b; }
-    .btn-success { background: var(--success); color: #1e1b4b; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-sm { padding: 4px 8px; font-size: 0.8rem; }
-    .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
-    .achievement-card { background: rgba(30, 27, 75, 0.6); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; text-align: center; opacity: 0.3; transition: all 0.2s; filter: grayscale(80%); }
-    .achievement-card.unlocked { opacity: 1; border-color: var(--primary); filter: grayscale(0%); box-shadow: 0 0 10px rgba(192, 132, 252, 0.15); }
-    .achievement-card .icon { font-size: 1.6rem; margin-bottom: 4px; }
-    .achievement-card .title { font-size: 0.75rem; font-weight: 700; color: #fff; display: block; }
-    .achievement-card .desc { font-size: 0.65rem; color: var(--text-muted); }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; }
-    .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 20px; width: 90%; max-width: 500px; }
+    .day-btn.has-data .status-dot { background: var(--easy); }
+
+    /* Blocks */
+    .add-block-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .btn { background: #fff; color: #0f172a; border: none; padding: 9px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-snack { background: rgba(34, 197, 94, 0.15); color: var(--easy); border: 1px solid var(--easy); }
+    .btn-aero { background: rgba(234, 179, 8, 0.15); color: var(--mod); border: 1px solid var(--mod); }
+    .btn-res { background: rgba(239, 68, 68, 0.15); color: var(--hard); border: 1px solid var(--hard); }
+    .btn-snack:hover { background: var(--easy); color: #0f172a; }
+    .btn-aero:hover { background: var(--mod); color: #0f172a; }
+    .btn-res:hover { background: var(--hard); color: #0f172a; }
+
+    .session-block { background: #0f172a; border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; margin-bottom: 12px; border-right: 4px solid var(--card-border); }
+    .session-block.type-snack { border-right-color: var(--easy); }
+    .session-block.type-aerobic { border-right-color: var(--mod); }
+    .session-block.type-resistance { border-right-color: var(--hard); }
     
-    /* Intensity Color Buttons */
-    .color-picker { display: flex; gap: 8px; margin-top: 4px; }
-    .color-btn { flex: 1; padding: 8px; border-radius: 6px; border: 2px solid transparent; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
-    .color-btn.green { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-    .color-btn.yellow { background: rgba(234, 179, 8, 0.2); color: #fde047; }
-    .color-btn.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-    .color-btn.green.selected { background: #22c55e; color: #000; border-color: #fff; }
-    .color-btn.yellow.selected { background: #eab308; color: #000; border-color: #fff; }
-    .color-btn.red.selected { background: #ef4444; color: #000; border-color: #fff; }
+    .block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .block-title { font-size: 1rem; font-weight: 700; }
+    .type-snack .block-title { color: var(--easy); }
+    .type-aerobic .block-title { color: var(--mod); }
+    .type-resistance .block-title { color: var(--hard); }
+    .del-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; }
+    .del-btn:hover { color: var(--hard); }
+
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+    select, input, textarea { background: #1e293b; border: 1px solid var(--card-border); color: var(--text); padding: 8px 10px; border-radius: 6px; outline: none; }
+    
+    /* Effort Picker */
+    .color-picker { display: flex; gap: 6px; }
+    .color-btn { flex: 1; padding: 6px; border-radius: 6px; border: 2px solid transparent; font-weight: bold; font-size: 0.8rem; cursor: pointer; text-align: center; transition: 0.2s; }
+    .color-btn.c-green { background: rgba(34, 197, 94, 0.15); color: var(--easy); }
+    .color-btn.c-yellow { background: rgba(234, 179, 8, 0.15); color: var(--mod); }
+    .color-btn.c-red { background: rgba(239, 68, 68, 0.15); color: var(--hard); }
+    .color-btn.c-green.selected { background: var(--easy); color: #000; border-color: #fff; }
+    .color-btn.c-yellow.selected { background: var(--mod); color: #000; border-color: #fff; }
+    .color-btn.c-red.selected { background: var(--hard); color: #000; border-color: #fff; }
+
+    /* Gamification Tab */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: #0f172a; border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; text-align: center; }
+    .stat-val { font-size: 1.8rem; font-weight: 800; color: #fff; margin: 4px 0; }
+    
+    .badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .badge-card { background: rgba(30, 41, 59, 0.6); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; text-align: center; transition: all 0.2s; opacity: 0.3; filter: grayscale(100%); position: relative; overflow: hidden; }
+    .badge-card.unlocked { opacity: 1; filter: grayscale(0%); }
+    .badge-card.tier-bronze.unlocked { border-color: var(--bronze); box-shadow: inset 0 0 10px rgba(180, 83, 9, 0.1); }
+    .badge-card.tier-silver.unlocked { border-color: var(--silver); box-shadow: inset 0 0 10px rgba(148, 163, 184, 0.1); }
+    .badge-card.tier-gold.unlocked { border-color: var(--gold); box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.1); }
+    .badge-card.tier-plat.unlocked { border-color: var(--plat); box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1); }
+    .badge-icon { font-size: 2rem; margin-bottom: 4px; }
+    .badge-title { font-size: 0.8rem; font-weight: 700; color: #fff; display: block; }
+    .badge-desc { font-size: 0.7rem; color: var(--text-muted); }
   </style>
 </head>
 <body>
 
   <header>
     <div>
-      <h1>מערכת מעקב בריאות וחיוניות</h1>
+      <h1>יומן בריאות וחיוניות</h1>
     </div>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
       <div class="nav-tabs">
-        <button class="tab-btn active" id="tabPlanner" onclick="switchView('planner')">יומן אימונים</button>
-        <button class="tab-btn" id="tabAchievements" onclick="switchView('achievements')">הישגים ותגים</button>
-        <button class="tab-btn" id="tabDatabase" onclick="switchView('database')">סנכרון נתונים</button>
+        <button class="tab-btn active" id="tabLogger" onclick="switchView('logger')">יומן אימונים</button>
+        <button class="tab-btn" id="tabChallenge" onclick="switchView('challenge')">אתגר שבועי</button>
+        <button class="tab-btn" id="tabTrophy" onclick="switchView('trophy')">חדר גביעים</button>
+        <button class="tab-btn" id="tabDatabase" onclick="switchView('database')">הגדרות וסנכרון</button>
       </div>
       <div class="cycle-control" id="cycleControls">
-        <span style="font-size: 0.8rem; font-weight: 600;" id="cycleLabel">התקדמות:</span>
-        <div id="dynamicWeekButtons" style="display: flex; gap: 4px;"></div>
+        <button class="cycle-btn" onclick="changeCycle(-1)" style="padding: 2px 8px;">&lt;</button>
+        <span style="font-size: 0.8rem; font-weight: 600; margin: 0 4px;" id="cycleLabel">מחזור 1</span>
+        <button class="cycle-btn" onclick="changeCycle(1)" style="padding: 2px 8px; margin-right: 8px;">&gt;</button>
+        <div id="dynamicWeekButtons" style="display: flex; gap: 4px; margin-right: 6px;"></div>
       </div>
     </div>
   </header>
 
-  <div class="gamify-bar">
-    <div class="gamify-stat">
-      <div class="gamify-icon" style="color: var(--fire);">🔥</div>
-      <div class="gamify-info">
-        <div class="gamify-label">רצף נוכחי</div>
-        <div class="gamify-val" id="hudStreak">0 ימים</div>
-      </div>
+  <div id="loggerView">
+    <div class="blueprint-hud" id="blueprintHud">
+      <!-- Injected by JS -->
     </div>
-    <div class="gamify-stat">
-      <div class="gamify-icon" style="color: var(--primary);">🛡️</div>
-      <div class="gamify-info">
-        <div class="gamify-label">מגני רצף</div>
-        <div class="gamify-val" id="hudShields">0 / 3</div>
-      </div>
-    </div>
-    <div class="gamify-stat">
-      <div class="gamify-icon" style="color: var(--success);">🎯</div>
-      <div class="gamify-info">
-        <div class="gamify-label">עמידה ביעדי מאמץ</div>
-        <div class="gamify-val" id="hudCompliance">0%</div>
-      </div>
-    </div>
-    <div class="gamify-stat">
-      <div class="gamify-icon" style="color: var(--accent);">👩‍❤️‍👨</div>
-      <div class="gamify-info">
-        <div class="gamify-label">אימונים זוגיים</div>
-        <div class="gamify-val" id="hudCouples">0 אימונים</div>
-      </div>
-    </div>
-    <div class="gamify-stat">
-      <div class="gamify-icon" style="color: var(--gold);">⭐</div>
-      <div class="gamify-info">
-        <div class="gamify-label"><span id="hudLevel">רמה 1</span></div>
-        <div class="gamify-val" id="hudXp">0 XP</div>
-        <div class="progress-bar-outer"><div class="progress-bar-inner" id="hudXpBar"></div></div>
-      </div>
-    </div>
-  </div>
 
-  <div id="plannerView">
     <div class="day-selector" id="daySelector"></div>
 
-    <div class="main-grid">
-      <div>
-        <div class="card">
-          <h2>
-            <span id="currentDayTitle">התוכנית להיום</span>
-            <span id="weekPhaseBadge" class="badge badge-load">שלב ריק</span>
-          </h2>
-          
-          <div class="section-header">
-            <span class="section-title">אימון התנגדות</span>
-            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('resistance')">+ הוסף</button>
-          </div>
-          <ul class="exercise-list" id="resistanceList"></ul>
-
-          <div class="section-header" style="margin-top: 18px;">
-            <span class="section-title">אימון אירובי</span>
-            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('aerobic')">+ הוסף</button>
-          </div>
-          <ul class="exercise-list" id="aerobicList"></ul>
-
-          <div class="section-header" style="margin-top: 18px;">
-            <span class="section-title" style="color: var(--warning);">חטיף יומי</span>
-            <button class="btn btn-secondary btn-sm" onclick="openAddExerciseModal('snack')">+ הוסף</button>
-          </div>
-          <ul class="exercise-list" id="snackList"></ul>
-
-          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--card-border);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <strong style="font-size: 0.9rem; color: #fff;">ניהול התקדמות שבועית</strong>
-              <button class="btn btn-secondary btn-sm" onclick="reRollCurrentWeek()">🎲 הגרל שבוע מחדש</button>
-            </div>
-            <button class="btn btn-warning btn-sm" style="width: 100%;" onclick="advanceWeekWorkflow()">🡠 השלם אימונים ומעבר לשבוע הבא</button>
-          </div>
-        </div>
+    <div class="card">
+      <div class="add-block-row">
+        <button class="btn btn-aero" onclick="addBlock('aerobic')">+ אירובי</button>
+        <button class="btn btn-res" onclick="addBlock('resistance')">+ אימון כוח</button>
+        <button class="btn btn-snack" onclick="addBlock('snack')">+ חטיף יומי</button>
       </div>
 
-      <div>
-        <div class="card">
-          <h2>רישום ביצוע אימונים</h2>
-          <form onsubmit="handleLogSubmit(event)">
-            
-            <div id="sessionLoggers"></div>
+      <div id="blocksContainer"></div>
 
-            <div class="form-group" id="distanceField" style="display: none; background: rgba(52, 211, 153, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed var(--running); margin-top: 12px;">
-              <label style="color: var(--running);">מרחק ריצה / הליכה (בק"מ)</label>
-              <input type="number" step="0.1" id="logDistance" placeholder="לדוגמה: 3.5" />
-            </div>
-
-            <div class="form-group" style="margin-top:12px; background: rgba(244, 114, 182, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed var(--accent);">
-              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--accent); font-size: 0.95rem;">
-                <input type="checkbox" id="logCouples" style="width: 18px; height: 18px;" />
-                👩‍❤️‍👨 אימון זוגי משותף (+50 XP בונוס)
-              </label>
-            </div>
-
-            <div class="form-group" style="margin-top:16px;">
-              <label>איך הרגיש האימון? (הערות)</label>
-              <textarea id="logNotes" rows="2" placeholder="היה מעולה, משקל קצת כבד..."></textarea>
-            </div>
-            <button type="submit" class="btn" style="width: 100%;">שמור אימון וקבל נקודות XP</button>
-          </form>
+      <div style="margin-top:20px; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--card-border);">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #fff; font-size: 0.95rem;">
+            <input type="checkbox" id="logCouples" style="width: 18px; height: 18px; accent-color: var(--plat);" onchange="updateDailyMeta('couples', this.checked)" />
+            👩‍❤️‍👨 אימון זוגי משותף
+          </label>
         </div>
+        <div class="form-group">
+          <label>הערות / איך הרגיש היום?</label>
+          <textarea id="logNotes" rows="2" placeholder="הרגשה כללית, דגשים לפעם הבאה..." oninput="updateDailyMeta('notes', this.value)"></textarea>
+        </div>
+        <button class="btn" style="width: 100%; margin-top: 12px; background: var(--easy);" onclick="saveDay()">💾 שמור יומן</button>
       </div>
     </div>
   </div>
 
-  <div id="achievementsView" style="display: none;">
+  <div id="challengeView" style="display: none;">
+    <div class="card" id="challengeContainer">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+  <div id="trophyView" style="display: none;">
     <div class="card">
-      <h2>הישגים וציוני דרך</h2>
-      <div class="achievements-grid" id="achievementsList"></div>
+      <h2>סיכום נתונים מצטבר</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <label>סך הכל אימונים</label>
+          <div class="stat-val" id="statWorkouts">0</div>
+        </div>
+        <div class="stat-card">
+          <label>מרחק מצטבר (ק״מ)</label>
+          <div class="stat-val" id="statDistance">0.0</div>
+        </div>
+        <div class="stat-card">
+          <label>זמן פעילות (שעות)</label>
+          <div class="stat-val" id="statTime">0.0</div>
+        </div>
+        <div class="stat-card">
+          <label>אימונים זוגיים</label>
+          <div class="stat-val" id="statCouples">0</div>
+        </div>
+      </div>
+
+      <h2 style="margin-top: 24px;">תגים והישגים</h2>
+      <div class="badge-grid" id="badgeContainer"></div>
     </div>
   </div>
 
   <div id="databaseView" style="display: none;">
     <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2>סנכרון מול גוגל דרייב</h2>
-        <button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ איפוס התקדמות (Soft)</button>
-      </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">בצעי אימות מול גוגל כדי לסנכרן. <strong>קטלוג</strong> מסנכרן את התרגילים והתוכנית. <strong>התקדמות</strong> שומרת את האימונים והרצף שלך.</p>
+      <h2>הגדרות תוכנית בסיס (שבועית)</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">הגדירי את כמות האימונים הרצויה מדי שבוע. התוכנית תישאר קבועה עד שתשני אותה כאן.</p>
       
-      <div class="form-group" style="margin-bottom: 16px;">
-        <label>מזהה לקוח (Client ID) של גוגל</label>
-        <input type="text" id="gcpClientId" placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com" dir="ltr" style="text-align: left;" />
-        <button class="btn btn-success btn-sm" style="margin-top: 6px; width: max-content;" onclick="saveClientId()">שמור מזהה</button>
-      </div>
-      
-      <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-        <strong style="display: block; margin-bottom: 8px; font-size: 0.95rem; color: var(--primary);">1. קטלוג תרגילים ותוכנית בסיס</strong>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button class="btn btn-primary btn-sm" onclick="authenticateDrive('push', 'catalog')">☁️ שמור קטלוג לדרייב</button>
-          <button class="btn btn-primary btn-sm" onclick="authenticateDrive('pull', 'catalog')">⬇️ טען קטלוג מהדרייב</button>
-          <button class="btn btn-secondary btn-sm" onclick="loadDataFromClipboard()">טעינת קוד JSON ידנית</button>
-        </div>
-      </div>
-
-      <div style="background: rgba(30, 27, 75, 0.4); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px;">
-        <strong style="display: block; margin-bottom: 8px; font-size: 0.95rem; color: var(--success);">2. ההתקדמות האישית שלך</strong>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button class="btn btn-success btn-sm" onclick="authenticateDrive('push', 'state')">☁️ שמור התקדמות לדרייב</button>
-          <button class="btn btn-success btn-sm" onclick="authenticateDrive('pull', 'state')">⬇️ טען התקדמות מהדרייב</button>
-        </div>
-      </div>
-
-      <div id="syncStatus" style="font-size: 0.85rem; margin-top: 12px; color: var(--warning);"></div>
-      <label style="margin-top: 16px; display: block;">קוד קטלוג (לקריאה/עריכה)</label>
-      <textarea id="jsonArea" rows="6" style="width: 100%; margin-top: 4px; font-family: monospace; font-size: 0.8rem;" dir="ltr" text-align="left"></textarea>
-    </div>
-  </div>
-
-  <!-- DROPDOWN MODAL -->
-  <div class="modal-backdrop" id="exerciseModal">
-    <div class="modal">
-      <h2 id="modalTitle" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--primary);">הוספה / עריכת תרגיל</h2>
-      <form onsubmit="saveModalExercise(event)">
-        <input type="hidden" id="modalType" />
-        <input type="hidden" id="modalEditIndex" value="-1" />
-        
+      <div class="form-row">
         <div class="form-group">
-          <label>בחירת קטגוריה</label>
-          <select id="modalCategorySelect" onchange="populateGroupedDropdown()"></select>
+          <label style="color: var(--mod);">אירובי (יעד)</label>
+          <input type="number" id="bpAeroTarget" min="0" max="10" value="2" />
         </div>
-        
         <div class="form-group">
-          <label>בחירת תרגיל</label>
-          <select id="modalExerciseSelect" required></select>
+          <label style="color: var(--hard);">כוח (יעד)</label>
+          <input type="number" id="bpResTarget" min="0" max="10" value="2" />
         </div>
-
-        <div class="form-group" style="margin-top: 8px; border-top: 1px solid var(--card-border); padding-top: 8px;">
-          <label>שיטת אימון</label>
-          <select id="modalPrescriptionType" onchange="togglePrescriptionFields()">
-            <option value="reps">סטים וחזרות (כוח)</option>
-            <option value="duration">זמן כולל (אירובי)</option>
-            <option value="intervals">אינטרוולים (HIIT)</option>
-          </select>
+        <div class="form-group">
+          <label style="color: var(--easy);">חטיפים (יעד)</label>
+          <input type="number" id="bpSnackTarget" min="0" max="10" value="2" />
         </div>
+      </div>
+      <button class="btn" style="background: #fff; color: #0f172a; margin-bottom: 24px;" onclick="saveBlueprintTargets()">עדכן תוכנית בסיס</button>
 
-        <div id="field_reps" class="form-row p-field">
-          <div class="form-group"><label>סטים</label><input type="number" id="modalRepSets" placeholder="למשל: 3" /></div>
-          <div class="form-group"><label>חזרות</label><input type="number" id="modalRepCount" placeholder="למשל: 5" /></div>
-          <div class="form-group"><label>מנוחה (שניות)</label><input type="number" id="modalRepRest" placeholder="למשל: 60" /></div>
+      <div style="border-top: 1px solid var(--card-border); padding-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h2>סנכרון וגיבוי גוגל דרייב</h2>
         </div>
         
-        <div id="field_duration" class="form-group p-field" style="display:none;">
-          <label>סך הכל דקות</label>
-          <input type="number" id="modalMin" placeholder="למשל: 20" />
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label>מזהה לקוח (Client ID)</label>
+          <input type="text" id="gcpClientId" placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com" dir="ltr" style="text-align: left;" />
+          <button class="btn" style="background: var(--easy); color: #0f172a; margin-top: 6px; width: max-content; padding: 4px 10px; font-size: 0.85rem;" onclick="saveClientId()">שמור מזהה</button>
         </div>
 
-        <div id="field_intervals" class="form-row p-field" style="display:none;">
-          <div class="form-group"><label>סיבובים</label><input type="number" id="modalIntSets" placeholder="למשל: 5" /></div>
-          <div class="form-group"><label>עבודה (שניות)</label><input type="number" id="modalIntWork" placeholder="למשל: 60" /></div>
-          <div class="form-group"><label>מנוחה (שניות)</label><input type="number" id="modalIntRest" placeholder="למשל: 60" /></div>
+        <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn" style="background: var(--plat); color: #0f172a;" onclick="authenticateDrive('push')">☁️ גבה נתונים לדרייב</button>
+            <button class="btn" style="background: var(--plat); color: #0f172a;" onclick="authenticateDrive('pull')">⬇️ שחזר נתונים מהדרייב</button>
+          </div>
         </div>
-        
-        <div class="form-group" style="margin-top: 8px; border-top: 1px solid var(--card-border); padding-top: 8px;">
-          <label>מאמץ מטרה (יעד)</label>
-          <input type="text" id="modalEffort" placeholder="למשל: Easy, Medium, Hard" required />
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
-          <button type="button" class="btn btn-secondary" onclick="closeModal()">ביטול</button>
-          <button type="submit" class="btn">שמור שינויים</button>
-        </div>
-      </form>
+        <div id="syncStatus" style="font-size: 0.85rem; margin-top: 12px; color: var(--mod);"></div>
+      </div>
     </div>
   </div>
 
@@ -319,775 +239,484 @@
       { id: "sat", name: "שבת", short: "ש'" }
     ];
 
-    const ACHIEVEMENTS_DATA = [
-      { id: "log_bronze", icon: "🥉", title: "צעד ראשון", desc: "אימון 1 נרשם" },
-      { id: "log_silver", icon: "🥈", title: "מתמידה", desc: "10 אימונים נרשמו" },
-      { id: "log_gold", icon: "🥇", title: "מקצוענית", desc: "25 אימונים נרשמו" },
-      { id: "log_plat", icon: "💎", title: "בלתי ניתנת לעצירה", desc: "50 אימונים נרשמו" },
+    const CAT_AERO = ["ריצה", "הליכה", "קפיצה בחבל", "אופניים", "שחייה", "אחר"];
+    const CAT_RES = ["קטלבלס", "משקל גוף", "גומיות התנגדות", "משקולות חופשיים", "אחר"];
 
-      { id: "snack_bronze", icon: "🍏", title: "חטיף (ארד)", desc: "חטיף יומי 1" },
-      { id: "snack_silver", icon: "🍎", title: "חטיף (כסף)", desc: "10 חטיפים" },
-      { id: "snack_gold", icon: "🥞", title: "חטיף (זהב)", desc: "25 חטיפים" },
-      { id: "snack_plat", icon: "🍱", title: "חטיף (פלטינום)", desc: "50 חטיפים" },
-
-      { id: "streak_bronze", icon: "🔥", title: "הרגל מברזל", desc: "רצף 7 ימים" },
-      { id: "streak_silver", icon: "🔥", title: "הרגל מפלדה", desc: "רצף 14 ימים" },
-      { id: "streak_gold", icon: "🔥", title: "הרגל מטיטניום", desc: "רצף 30 ימים" },
-      { id: "streak_plat", icon: "🔥", title: "הרגל מיהלום", desc: "רצף 60 ימים" },
-
-      { id: "couples_bronze", icon: "🥉", title: "הצמד הדינמי", desc: "אימון זוגי 1" },
-      { id: "couples_silver", icon: "🥈", title: "הצמד הדינמי", desc: "5 אימונים זוגיים" },
-      { id: "couples_gold", icon: "🥇", title: "הצמד הדינמי", desc: "10 אימונים זוגיים" },
-      { id: "couples_plat", icon: "💎", title: "הצמד הדינמי", desc: "25 אימונים זוגיים" },
-
-      { id: "comp_bronze", icon: "🎯", title: "מדויקת (ארד)", desc: "70% עמידה במאמץ" },
-      { id: "comp_silver", icon: "🎯", title: "מדויקת (כסף)", desc: "80% עמידה במאמץ" },
-      { id: "comp_gold", icon: "🎯", title: "מדויקת (זהב)", desc: "90% עמידה במאמץ" },
-      { id: "comp_plat", icon: "🎯", title: "שלמות", desc: "100% (מינימום 10 אימונים)" }
+    const BADGES = [
+      { id: "w_br", type: "workouts", tier: "bronze", title: "התחלה חזקה", desc: "10 אימונים", thresh: 10, icon: "👟" },
+      { id: "w_sv", type: "workouts", tier: "silver", title: "עקבית", desc: "50 אימונים", thresh: 50, icon: "👟" },
+      { id: "w_gd", type: "workouts", tier: "gold", title: "מכונת אימונים", desc: "100 אימונים", thresh: 100, icon: "👟" },
+      { id: "w_pt", type: "workouts", tier: "plat", title: "אגדה", desc: "250 אימונים", thresh: 250, icon: "👟" },
+      
+      { id: "d_br", type: "distance", tier: "bronze", title: "מגלה ארצות", desc: "20 ק״מ", thresh: 20, icon: "🗺️" },
+      { id: "d_sv", type: "distance", tier: "silver", title: "נודדת", desc: "100 ק״מ", thresh: 100, icon: "🗺️" },
+      { id: "d_gd", type: "distance", tier: "gold", title: "מרתון", desc: "250 ק״מ", thresh: 250, icon: "🗺️" },
+      { id: "d_pt", type: "distance", tier: "plat", title: "חוצת יבשות", desc: "500 ק״מ", thresh: 500, icon: "🗺️" },
+      
+      { id: "t_br", type: "time", tier: "bronze", title: "תזוזה", desc: "10 שעות פעילות", thresh: 600, icon: "⏱️" },
+      { id: "t_sv", type: "time", tier: "silver", title: "מוקדשת", desc: "50 שעות פעילות", thresh: 3000, icon: "⏱️" },
+      { id: "t_gd", type: "time", tier: "gold", title: "זמן ברזל", desc: "100 שעות פעילות", thresh: 6000, icon: "⏱️" },
+      { id: "t_pt", type: "time", tier: "plat", title: "מאסטרית הזמן", desc: "250 שעות פעילות", thresh: 15000, icon: "⏱️" },
+      
+      { id: "c_br", type: "couples", tier: "bronze", title: "זוגיות פעילה", desc: "5 אימונים משותפים", thresh: 5, icon: "🤝" },
+      { id: "c_sv", type: "couples", tier: "silver", title: "זמן איכות", desc: "10 אימונים משותפים", thresh: 10, icon: "🤝" },
+      { id: "c_gd", type: "couples", tier: "gold", title: "צוות לעניין", desc: "25 אימונים משותפים", thresh: 25, icon: "🤝" },
+      { id: "c_pt", type: "couples", tier: "plat", title: "פאוור קאפל", desc: "50 אימונים משותפים", thresh: 50, icon: "🤝" }
     ];
 
-    let appData = JSON.parse(localStorage.getItem("health_tracker_app_data"));
-    if (!appData || appData.version !== 1.0) {
-      appData = { version: 1.0, exercise_catalog: {}, mesocycle_structure: {} };
-      localStorage.setItem("health_tracker_app_data", JSON.stringify(appData));
-      localStorage.setItem("health_tracker_generated_plans", JSON.stringify({}));
-    }
-
-    let metaState = JSON.parse(localStorage.getItem("health_tracker_meta")) || { cycle: 1, week: 1, activeWeeks: 6 };
-
-    let state = {
-      currentCycle: metaState.cycle, currentWeek: metaState.week, activeWeeksInCycle: metaState.activeWeeks,
-      currentDay: DAYS[new Date().getDay()].id,
-      logs: JSON.parse(localStorage.getItem("health_tracker_logs")) || {},
-      gamify: JSON.parse(localStorage.getItem("health_tracker_gamify")) || {},
-      generatedPlans: JSON.parse(localStorage.getItem("health_tracker_generated_plans")) || {}
+    let state = JSON.parse(localStorage.getItem("health_v2_state")) || {
+      meta: { cycle: 1, week: 1, day: DAYS[new Date().getDay()].id },
+      blueprint: { aerobic: 2, resistance: 2, snack: 2 },
+      logs: {},
+      challenges: {}
     };
-
-    // Safe Gamify Initialization
-    state.gamify.xp = state.gamify.xp || 0;
-    state.gamify.streak = state.gamify.streak || 0;
-    state.gamify.shields = state.gamify.shields !== undefined ? state.gamify.shields : 2;
-    state.gamify.unlocked = state.gamify.unlocked || [];
-    state.gamify.couplesCount = state.gamify.couplesCount || 0;
-    state.gamify.totalSessionsCount = state.gamify.totalSessionsCount || 0;
-    state.gamify.compliantSessionsCount = state.gamify.compliantSessionsCount || 0;
-    state.gamify.snackCount = state.gamify.snackCount || 0;
-
-    // --- EFFORT PARSING LOGIC ---
-    function parseEffort(effortStr) {
-        if (!effortStr) return 2; // Default Moderate
-        const e = effortStr.toLowerCase();
-        if (e.includes("easy") || e.includes("light") || e.includes("green") || e.includes("קל")) return 1;
-        if (e.includes("hard") || e.includes("max") || e.includes("red") || e.includes("קשה")) return 3;
-        return 2;
-    }
     
-    function translateEffort(effortStr) {
-        let val = parseEffort(effortStr);
-        if (val === 1) return 'קל';
-        if (val === 3) return 'קשה';
-        return 'בינוני';
-    }
-
-    function getEffortStyle(val) {
-        if (val === 1) return 'background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #4ade80; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;';
-        if (val === 3) return 'background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #fca5a5; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;';
-        return 'background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid #fde047; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;';
-    }
+    // Safety check for legacy saves
+    if(!state.challenges) state.challenges = {};
+    
+    let stats = { workouts: 0, distance: 0, time: 0, couples: 0 };
 
     function init() {
-      document.getElementById("gcpClientId").value = localStorage.getItem("health_gdrive_client_id") || "";
-      ensurePlanExists(state.currentCycle, state.currentWeek);
-      updateDynamicWeekButtons();
-      renderHUD();
+      document.getElementById("gcpClientId").value = localStorage.getItem("gdrive_client_id") || "";
+      document.getElementById("bpAeroTarget").value = state.blueprint.aerobic;
+      document.getElementById("bpResTarget").value = state.blueprint.resistance;
+      document.getElementById("bpSnackTarget").value = state.blueprint.snack;
+      
+      recalcStats();
+      renderNavigation();
       renderDaySelector();
-      renderDayView();
-      renderAchievements();
-      document.getElementById("jsonArea").value = JSON.stringify(appData, null, 2);
-    }
-
-    function factoryReset() {
-      if (confirm("⚠️ אזהרה: פעולה זו תמחק לצמיתות את היומן, הנקודות והרצפים שלך ותאפשר לך להתחיל מחדש. התוכניות והקטלוג ישמרו ללא שינוי. להמשיך?")) {
-        state.logs = {};
-        state.gamify = { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [], totalSessionsCount: 0, compliantSessionsCount: 0, snackCount: 0 };
-        saveState();
-        init();
-        alert("ההתקדמות אופסה. התוכניות השבועיות נשמרו בהצלחה.");
-      }
-    }
-
-    window.reRollCurrentWeek = function() {
-      if (confirm("🎲 האם להגריל מחדש את אימוני השבוע? (אימונים שכבר ביצעת השבוע לא יימחקו).")) {
-        const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
-        delete state.generatedPlans[planKey];
-        saveState();
-        ensurePlanExists(state.currentCycle, state.currentWeek);
-        renderDaySelector();
-        renderDayView();
-        alert("השבוע הוגרל מחדש בהצלחה!");
-      }
-    }
-
-    function ensurePlanExists(cycle, week) {
-      const key = `c${cycle}_w${week}`;
-      if (!state.generatedPlans) state.generatedPlans = {};
-      if (state.generatedPlans[key]) return; 
-
-      const phaseKey = week === 6 ? "week6_deload" : `week${week}`;
-      const blueprint = appData.mesocycle_structure[phaseKey];
-      if (!blueprint) return; 
-
-      const plan = JSON.parse(JSON.stringify(blueprint)); 
-      const catalog = appData.exercise_catalog || {};
-
-      Object.keys(plan.days).forEach(dayId => {
-        ['resistance', 'aerobic', 'snack'].forEach(type => {
-          const usedIds = new Set();
-          if(plan.days[dayId][type]) {
-            plan.days[dayId][type].forEach(slot => {
-               let candidates = Object.keys(catalog).filter(id => {
-                   let cat = catalog[id];
-                   let matchType = (cat.type === type) || (type === 'snack' && (cat.type === 'resistance' || cat.type === 'aerobic'));
-                   return matchType && cat.category === slot.category && !cat.excludeFromRandom;
-               });
-               
-               let unused = candidates.filter(id => !usedIds.has(id));
-               if (unused.length > 0) candidates = unused;
-               
-               if (candidates.length > 0) {
-                 const picked = candidates[Math.floor(Math.random() * candidates.length)];
-                 slot.exerciseId = picked;
-                 usedIds.add(picked);
-               } else {
-                 slot.exerciseId = null; 
-               }
-            });
-          }
-        });
-      });
-      state.generatedPlans[key] = plan;
-      saveState();
-    }
-
-    function formatPrescription(p) {
-      if (!p) return "";
-      if (p.type === 'duration') return `${p.minutes} דקות`;
-      if (p.type === 'intervals') return `${p.sets} סיבובים: ${p.work_sec}ש עבודה / ${p.rest_sec}ש מנוחה`;
-      if (p.type === 'reps') return `${p.sets} סטים x ${p.reps} חזרות @ ${p.rest_sec}ש מנוחה`;
-      return "לפי הרגשה";
-    }
-
-    function updateDynamicWeekButtons() {
-      document.getElementById("cycleLabel").innerText = `מחזור ${state.currentCycle}:`;
-      const container = document.getElementById("dynamicWeekButtons");
-      container.innerHTML = "";
-      const displayCount = 6;
-      for (let w = 1; w <= displayCount; w++) {
-        const btn = document.createElement("button");
-        btn.className = `cycle-btn ${w === state.currentWeek ? "active" : ""}`;
-        btn.innerText = `שבוע ${w}`;
-        btn.onclick = () => selectWeek(w);
-        container.appendChild(btn);
-      }
+      renderBlueprintHUD();
+      renderBlocks();
+      renderChallenge();
     }
 
     function switchView(view) {
-      document.getElementById("plannerView").style.display = view === "planner" ? "block" : "none";
-      document.getElementById("achievementsView").style.display = view === "achievements" ? "block" : "none";
+      document.getElementById("loggerView").style.display = view === "logger" ? "block" : "none";
+      document.getElementById("challengeView").style.display = view === "challenge" ? "block" : "none";
+      document.getElementById("trophyView").style.display = view === "trophy" ? "block" : "none";
       document.getElementById("databaseView").style.display = view === "database" ? "block" : "none";
-      document.getElementById("cycleControls").style.display = view === "planner" ? "flex" : "none";
-      document.getElementById("tabPlanner").classList.toggle("active", view === "planner");
-      document.getElementById("tabAchievements").classList.toggle("active", view === "achievements");
-      document.getElementById("tabDatabase").classList.toggle("active", view === "database");
-      if (view === "achievements") renderAchievements();
-    }
-
-    function selectWeek(w) { 
-      state.currentWeek = w; 
-      ensurePlanExists(state.currentCycle, state.currentWeek);
-      updateDynamicWeekButtons(); 
-      renderDaySelector(); 
-      renderDayView(); 
-    }
-
-    function selectDay(d) { state.currentDay = d; renderDaySelector(); renderDayView(); }
-
-    function renderHUD() {
-      const g = state.gamify;
-      document.getElementById("hudStreak").innerText = `${g.streak} ימים`;
-      document.getElementById("hudShields").innerText = `${g.shields} / 3`;
-      document.getElementById("hudCouples").innerText = `${g.couplesCount || 0} נרשמו`;
       
-      let comp = g.totalSessionsCount > 0 ? Math.round((g.compliantSessionsCount / g.totalSessionsCount) * 100) : 0;
-      document.getElementById("hudCompliance").innerText = `${comp}%`;
+      document.getElementById("cycleControls").style.display = (view === "logger" || view === "challenge") ? "flex" : "none";
+      
+      document.getElementById("tabLogger").classList.toggle("active", view === "logger");
+      document.getElementById("tabChallenge").classList.toggle("active", view === "challenge");
+      document.getElementById("tabTrophy").classList.toggle("active", view === "trophy");
+      document.getElementById("tabDatabase").classList.toggle("active", view === "database");
+      
+      if(view === "trophy") renderTrophyRoom();
+      if(view === "challenge") renderChallenge();
+    }
 
-      const level = Math.floor(g.xp / 400) + 1;
-      document.getElementById("hudLevel").innerText = `רמה ${level}`;
-      document.getElementById("hudXp").innerText = `${g.xp} XP`;
-      document.getElementById("hudXpBar").style.width = `${Math.min(100, ((g.xp % 400) / 400) * 100)}%`;
+    function changeCycle(dir) {
+      state.meta.cycle = Math.max(1, state.meta.cycle + dir);
+      state.meta.week = 1;
+      saveState(); 
+      renderNavigation(); 
+      renderDaySelector(); 
+      renderBlueprintHUD(); 
+      renderBlocks();
+      renderChallenge();
+    }
+
+    function setWeek(w) {
+      state.meta.week = w;
+      saveState(); 
+      renderNavigation(); 
+      renderDaySelector(); 
+      renderBlueprintHUD(); 
+      renderBlocks();
+      renderChallenge();
+    }
+
+    function setDay(d) {
+      state.meta.day = d;
+      saveState(); renderDaySelector(); renderBlocks();
+    }
+
+    function renderNavigation() {
+      document.getElementById("cycleLabel").innerText = `מחזור ${state.meta.cycle}`;
+      const container = document.getElementById("dynamicWeekButtons");
+      container.innerHTML = "";
+      for(let w=1; w<=6; w++) {
+        const btn = document.createElement("button");
+        btn.className = `cycle-btn ${w === state.meta.week ? "active" : ""}`;
+        btn.innerText = `ש' ${w}`;
+        btn.onclick = () => setWeek(w);
+        container.appendChild(btn);
+      }
     }
 
     function renderDaySelector() {
       const container = document.getElementById("daySelector");
       container.innerHTML = "";
       DAYS.forEach(day => {
-        const logKey = `c${state.currentCycle}_w${state.currentWeek}_${day.id}`;
-        const log = state.logs[logKey];
-        const isCompleted = log && log.sessionStatus && log.sessionStatus.overall === "completed";
+        const key = `c${state.meta.cycle}_w${state.meta.week}_${day.id}`;
+        const hasData = state.logs[key] && (state.logs[key].aerobic?.length > 0 || state.logs[key].resistance?.length > 0 || state.logs[key].snack?.length > 0);
         const btn = document.createElement("button");
-        btn.className = `day-btn ${day.id === state.currentDay ? "active" : ""} ${isCompleted ? "completed" : ""} ${(log && log.sessionStatus && log.sessionStatus.overall === "shielded") ? "shielded" : ""}`;
-        btn.onclick = () => selectDay(day.id);
+        btn.className = `day-btn ${day.id === state.meta.day ? "active" : ""} ${hasData ? "has-data" : ""}`;
+        btn.onclick = () => setDay(day.id);
         btn.innerHTML = `<span style="font-weight:700;font-size:0.9rem;">${day.short}</span><span class="status-dot"></span>`;
         container.appendChild(btn);
       });
     }
 
-    window.selectColor = function(key, color) {
-      document.getElementById(`color_val_${key}`).value = color;
-      const btns = document.querySelectorAll(`.btn-${key}`);
-      btns.forEach(b => b.classList.remove('selected'));
-      document.getElementById(`btn_${key}_${color}`).classList.add('selected');
-    };
+    function getCurrentKey() { return `c${state.meta.cycle}_w${state.meta.week}_${state.meta.day}`; }
+    function getChallengeKey() { return `c${state.meta.cycle}_w${state.meta.week}`; }
 
-    function renderSessionLoggers(dayData, existingLog) {
-      const container = document.getElementById("sessionLoggers");
-      container.innerHTML = "";
-      const statuses = existingLog ? (existingLog.sessionStatus || {}) : {};
-      const colors = existingLog ? (existingLog.sessionColors || {}) : {};
+    function getWeeklyCounts() {
+      let counts = { aerobic: 0, resistance: 0, snack: 0 };
+      DAYS.forEach(d => {
+        const key = `c${state.meta.cycle}_w${state.meta.week}_${d.id}`;
+        if(state.logs[key]) {
+          if(state.logs[key].aerobic) counts.aerobic += state.logs[key].aerobic.length;
+          if(state.logs[key].resistance) counts.resistance += state.logs[key].resistance.length;
+          if(state.logs[key].snack) counts.snack += state.logs[key].snack.length;
+        }
+      });
+      return counts;
+    }
+
+    function renderBlueprintHUD() {
+      const counts = getWeeklyCounts();
+      const hud = document.getElementById("blueprintHud");
       
-      let hasScheduled = false;
-      let hasAerobic = false;
-
-      const renderLogger = (key, label) => {
-        if (!dayData[key] || dayData[key].length === 0) return;
-        hasScheduled = true;
-        if (key === 'aerobic') hasAerobic = true;
-        
-        let targetSum = 0; let targetCount = 0;
-        dayData[key].forEach(ex => { targetSum += parseEffort(ex.effort); targetCount++; });
-        let sessionTargetNum = targetCount > 0 ? Math.round(targetSum / targetCount) : 2;
-        let targetWord = sessionTargetNum === 1 ? '🟢 קל' : (sessionTargetNum === 3 ? '🔴 קשה' : '🟡 בינוני');
-
-        const statusVal = statuses[key] || "completed";
-        const colorVal = colors[key] || "";
-        
-        container.innerHTML += `
-          <div class="form-group" style="border-right: 2px solid var(--primary); padding-right: 10px; margin-bottom: 12px; background: rgba(30, 27, 75, 0.4); padding: 10px; border-radius: 6px;">
-            <label style="color: #fff; font-size: 0.95rem; margin-bottom: 2px;">${label}</label>
-            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">רמת קושי מתוכננת: ${targetWord}</span>
-            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                <select id="status_${key}" style="flex: 1; border-color: var(--primary);">
-                  <option value="completed" ${statusVal==='completed'?'selected':''}>בוצע בהצלחה</option>
-                  <option value="modified" ${statusVal==='modified'?'selected':''}>בוצע בשינויים</option>
-                  <option value="missed" ${statusVal==='missed'?'selected':''}>לא בוצע / דלגתי</option>
-                </select>
-            </div>
-            <input type="hidden" id="color_val_${key}" value="${colorVal}" />
-            <div class="color-picker" id="rpe_container_${key}">
-              <div id="btn_${key}_green" class="color-btn green btn-${key} ${colorVal==='green'?'selected':''}" onclick="selectColor('${key}', 'green')">🟢 קל</div>
-              <div id="btn_${key}_yellow" class="color-btn yellow btn-${key} ${colorVal==='yellow'?'selected':''}" onclick="selectColor('${key}', 'yellow')">🟡 בינוני</div>
-              <div id="btn_${key}_red" class="color-btn red btn-${key} ${colorVal==='red'?'selected':''}" onclick="selectColor('${key}', 'red')">🔴 קשה</div>
-            </div>
+      const drawBar = (type, label, cssClass, count, target) => {
+        let pct = target > 0 ? Math.min(100, (count / target) * 100) : 100;
+        let isComp = target > 0 && count >= target;
+        return `
+          <div class="bp-stat ${cssClass} ${isComp ? 'completed' : ''}">
+            <div class="bp-header"><span>${label}</span> <span>${count} / ${target}</span></div>
+            <div class="bp-bar-bg"><div class="bp-bar-fill" style="width: ${pct}%;"></div></div>
           </div>
         `;
       };
 
-      renderLogger('resistance', 'אימון התנגדות');
-      renderLogger('aerobic', 'אירובי / אינטרוולים');
-      renderLogger('snack', 'חטיף יומי');
-
-      document.getElementById("distanceField").style.display = hasAerobic ? "block" : "none";
-
-      if (!hasScheduled) {
-        container.innerHTML = `<div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">יום מנוחה מתוכנן. שמרי על ההרגל ושמרי את היומן בכל מקרה!</div>`;
-      }
+      hud.innerHTML = 
+        drawBar('aerobic', 'אירובי (צהוב)', 'bp-aero', counts.aerobic, state.blueprint.aerobic) +
+        drawBar('resistance', 'כוח (אדום)', 'bp-res', counts.resistance, state.blueprint.resistance) +
+        drawBar('snack', 'חטיף (ירוק)', 'bp-snack', counts.snack, state.blueprint.snack);
     }
 
-    function renderDayView() {
-      const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
-      const plan = state.generatedPlans[planKey];
-      if (!plan || !plan.days) return;
-
-      const dayData = plan.days[state.currentDay] || { resistance: [], aerobic: [], snack: [] };
-      const existingLog = state.logs[`${planKey}_${state.currentDay}`];
-
-      document.getElementById("currentDayTitle").innerText = `התוכנית ליום ${DAYS.find(d => d.id === state.currentDay).name}`;
-      document.getElementById("weekPhaseBadge").className = `badge ${plan.badge}`;
-      
-      let phaseHebrew = plan.phaseName;
-      if(phaseHebrew.includes("Week 1")) phaseHebrew = "שבוע 1: כיול בסיס (5 ק״ג)";
-      if(phaseHebrew.includes("Week 2")) phaseHebrew = "שבוע 2: התקדמות (5 ק״ג)";
-      if(phaseHebrew.includes("Week 3")) phaseHebrew = "שבוע 3: שיא הנפח (5 ק״ג)";
-      if(phaseHebrew.includes("Week 4")) phaseHebrew = "שבוע 4: מקסימום חזרות (5 ק״ג)";
-      if(phaseHebrew.includes("Week 5")) phaseHebrew = "שבוע 5: שיא משקל (8 ק״ג תחתון)";
-      if(phaseHebrew.includes("Week 6")) phaseHebrew = "שבוע 6: דילואוד והתאוששות";
-
-      document.getElementById("weekPhaseBadge").innerText = phaseHebrew;
-
-      renderExerciseList("resistance", dayData.resistance || []);
-      renderExerciseList("aerobic", dayData.aerobic || []);
-      renderExerciseList("snack", dayData.snack || []);
-      renderSessionLoggers(dayData, existingLog);
-
-      if (existingLog) {
-        document.getElementById("logNotes").value = existingLog.notes || "";
-        document.getElementById("logDistance").value = existingLog.distance || "";
-        document.getElementById("logCouples").checked = existingLog.couples || false;
-      } else {
-        document.getElementById("logNotes").value = "";
-        document.getElementById("logDistance").value = "";
-        document.getElementById("logCouples").checked = false;
-      }
+    function ensureLogExists() {
+      const key = getCurrentKey();
+      if(!state.logs[key]) state.logs[key] = { aerobic: [], resistance: [], snack: [], couples: false, notes: "" };
+      return key;
     }
 
-    function renderExerciseList(type, list) {
-      const catalog = appData.exercise_catalog || {};
-      document.getElementById(`${type}List`).innerHTML = list.map((item, index) => {
-        if (!item.exerciseId || !catalog[item.exerciseId]) return `<li class="exercise-item"><div><strong>לא נמצא תרגיל מתאים בקטלוג</strong></div></li>`;
-        const entry = catalog[item.exerciseId];
-        
-        let effortVal = parseEffort(item.effort);
-        let effortHtml = `<span class="meta" style="${getEffortStyle(effortVal)} display: inline-block; margin-top: 4px;">יעד: ${translateEffort(item.effort)}</span>`;
-
-        let catNameHebrew = item.category.toUpperCase().replace("_"," ");
-        if(item.category === "lower_body") catNameHebrew = "פלג גוף תחתון";
-        if(item.category === "upper_body") catNameHebrew = "פלג גוף עליון";
-        if(item.category === "power") catNameHebrew = "כוח מתפרץ";
-        if(item.category === "core") catNameHebrew = "ליבה";
-        if(item.category === "strength") catNameHebrew = "כוח";
-        if(item.category === "walk") catNameHebrew = "הליכה";
-        if(item.category === "run") catNameHebrew = "ריצה";
-        if(item.category === "cardio") catNameHebrew = "אירובי";
-
-        return `
-          <li class="exercise-item">
-            <div>
-              <strong style="font-size: 1rem;">${entry.name}</strong>
-              <span class="meta" style="color:var(--accent); font-weight:600; display:block;">${catNameHebrew}</span>
-              <span class="meta" style="color: #fff; margin-bottom: 2px;">${formatPrescription(item.prescription)}</span>
-              ${effortHtml}
-              ${entry.equipment && entry.equipment !== 'None' ? `<span class="meta" style="margin-top:4px;">• ציוד: ${entry.equipment}</span>` : ''}
-              ${entry.notes ? `<span class="meta" style="font-style:italic;">${entry.notes}</span>` : ''}
-            </div>
-            <div class="item-actions">
-              <button onclick="openEditExerciseModal('${type}', ${index})">✎</button>
-              <button class="del" onclick="deleteExercise('${type}', ${index})">✕</button>
-            </div>
-          </li>
-        `;
-      }).join("");
-    }
-
-    function handleLogSubmit(e) {
-      e.preventDefault();
-      const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
-      const logKey = `${planKey}_${state.currentDay}`;
-      const dayData = state.generatedPlans[planKey].days[state.currentDay];
-      const notes = document.getElementById("logNotes").value;
-      const distance = document.getElementById("logDistance").value;
-      const isCouples = document.getElementById("logCouples").checked;
-
-      const sessionStatus = {};
-      const sessionColors = {};
-      let scheduledCount = 0; let completedCount = 0;
-      let complianceMatches = 0;
-
-      const isNewLog = !state.logs[logKey];
-
-      ['resistance', 'aerobic', 'snack'].forEach(key => {
-        const el = document.getElementById(`status_${key}`);
-        if (el) {
-          const status = el.value;
-          sessionStatus[key] = status;
-          scheduledCount++;
-          if (status === 'completed' || status === 'modified') {
-            completedCount++;
-            const loggedColor = document.getElementById(`color_val_${key}`).value || 'green';
-            sessionColors[key] = loggedColor;
-
-            if (isNewLog) {
-                state.gamify.totalSessionsCount++;
-                if (key === 'snack') state.gamify.snackCount++;
-
-                let targetSum = 0; let targetCount = 0;
-                if (dayData[key]) {
-                    dayData[key].forEach(ex => { targetSum += parseEffort(ex.effort); targetCount++; });
-                }
-                let sessionTargetNum = targetCount > 0 ? Math.round(targetSum / targetCount) : 2;
-                let loggedVal = loggedColor === 'green' ? 1 : (loggedColor === 'red' ? 3 : 2);
-
-                if (loggedVal === sessionTargetNum) {
-                    state.gamify.compliantSessionsCount++;
-                    complianceMatches++;
-                }
-            }
-          }
-        }
+    function addBlock(type) {
+      const key = ensureLogExists();
+      let defaultEffort = type === 'aerobic' ? 2 : (type === 'resistance' ? 3 : 1);
+      state.logs[key][type].push({
+        id: Date.now().toString(), subcat: type==='aerobic' ? CAT_AERO[0] : CAT_RES[0],
+        time: "", distance: "", effort: defaultEffort
       });
+      saveState(); renderBlocks(); renderBlueprintHUD();
+    }
 
-      const isRestDay = (scheduledCount === 0);
-      const completionRatio = isRestDay ? 1.0 : (completedCount / scheduledCount);
+    function delBlock(type, id) {
+      const key = getCurrentKey();
+      state.logs[key][type] = state.logs[key][type].filter(b => b.id !== id);
+      saveState(); renderBlocks(); renderBlueprintHUD();
+    }
+
+    function updateBlockField(type, id, field, val) {
+      const key = getCurrentKey();
+      const block = state.logs[key][type].find(b => b.id === id);
+      if(block) {
+        if(field === 'time' || field === 'distance') block[field] = val === "" ? "" : parseFloat(val);
+        else block[field] = val;
+        saveState(); 
+      }
+    }
+
+    function updateEffort(type, id, val) {
+      updateBlockField(type, id, 'effort', parseInt(val));
+      renderBlocks(); 
+    }
+
+    function updateDailyMeta(field, val) {
+      const key = ensureLogExists();
+      state.logs[key][field] = val;
+      saveState();
+    }
+
+    function renderBlocks() {
+      const key = getCurrentKey();
+      const log = state.logs[key] || { aerobic: [], resistance: [], snack: [], couples: false, notes: "" };
+      const container = document.getElementById("blocksContainer");
+      container.innerHTML = "";
+
+      document.getElementById("logCouples").checked = log.couples;
+      document.getElementById("logNotes").value = log.notes;
+
+      const renderType = (type, label, blocks, catList) => {
+        blocks.forEach(b => {
+          let catOpts = catList.map(c => `<option value="${c}" ${b.subcat===c?'selected':''}>${c}</option>`).join("");
+          let distHtml = type === 'aerobic' ? `
+            <div class="form-group">
+              <label>מרחק (ק״מ)</label>
+              <input type="number" step="0.1" value="${b.distance || ''}" oninput="updateBlockField('${type}', '${b.id}', 'distance', this.value)" />
+            </div>` : '';
+
+          container.innerHTML += `
+            <div class="session-block type-${type}">
+              <div class="block-header">
+                <span class="block-title">${label}</span>
+                <button class="del-btn" onclick="delBlock('${type}', '${b.id}')">✕</button>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>סוג פעילות</label>
+                  <select onchange="updateBlockField('${type}', '${b.id}', 'subcat', this.value)">${catOpts}</select>
+                </div>
+                <div class="form-group">
+                  <label>זמן (דקות)</label>
+                  <input type="number" value="${b.time || ''}" oninput="updateBlockField('${type}', '${b.id}', 'time', this.value)" />
+                </div>
+                ${distHtml}
+              </div>
+              <div class="form-group" style="margin-top:4px;">
+                <label>מאמץ שהושקע</label>
+                <div class="color-picker">
+                  <div class="color-btn c-green ${b.effort===1?'selected':''}" onclick="updateEffort('${type}', '${b.id}', 1)">🟢 קל</div>
+                  <div class="color-btn c-yellow ${b.effort===2?'selected':''}" onclick="updateEffort('${type}', '${b.id}', 2)">🟡 בינוני</div>
+                  <div class="color-btn c-red ${b.effort===3?'selected':''}" onclick="updateEffort('${type}', '${b.id}', 3)">🔴 קשה</div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      };
+
+      renderType('aerobic', 'אימון אירובי', log.aerobic, CAT_AERO);
+      renderType('resistance', 'אימון כוח', log.resistance, CAT_RES);
+      renderType('snack', 'חטיף יומי', log.snack, CAT_RES);
+
+      if(log.aerobic.length === 0 && log.resistance.length === 0 && log.snack.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted); font-size: 0.9rem;">אין אימונים להיום. לחצי על הכפתורים למעלה כדי להוסיף.</div>`;
+      }
+    }
+
+    // --- CHALLENGE TAB LOGIC ---
+    function renderChallenge() {
+      const key = getChallengeKey();
+      const container = document.getElementById("challengeContainer");
+      const challenge = state.challenges[key];
+
+      if (!challenge) {
+        container.innerHTML = `
+          <h2>הגדרת אתגר שבועי חדש</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">בחרי תרגיל אחד ויעד חזרות שבועי כדי לאתגר את עצמך. (למשל: 100 שכיבות סמיכה מצטברות השבוע).</p>
+          <div class="form-group">
+            <label>שם התרגיל</label>
+            <input type="text" id="chalName" placeholder="הקלידי שם תרגיל (למשל סקוואט)..." />
+          </div>
+          <div class="form-group" style="margin-top: 12px;">
+            <label>יעד חזרות שבועי (סה״כ)</label>
+            <input type="number" id="chalTarget" placeholder="למשל: 100" />
+          </div>
+          <button class="btn" style="background: var(--gold); color: #0f172a; margin-top: 16px; width: 100%;" onclick="startChallenge()">🎯 התחל אתגר</button>
+        `;
+      } else {
+        const pct = Math.min(100, (challenge.progress / challenge.target) * 100);
+        const isCompleted = challenge.progress >= challenge.target;
+        
+        container.innerHTML = `
+          <h2 style="color: var(--gold);">${challenge.name} (שבוע ${state.meta.week})</h2>
+          <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 8px;">${challenge.progress} / ${challenge.target} חזרות מבוצעות</div>
+          
+          <div class="bp-bar-bg" style="height: 12px; margin-bottom: 24px;">
+            <div class="bp-bar-fill" style="width: ${pct}%; background: var(--gold);"></div>
+          </div>
+          
+          ${isCompleted ? `<div style="color: var(--easy); font-weight: bold; text-align: center; font-size: 1.2rem; margin-bottom: 16px;">🏆 האתגר השבועי הושלם בהצלחה!</div>` : ''}
+          
+          <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 8px; border: 1px solid var(--card-border);">
+            <label style="display: block; margin-bottom: 8px;">כמה חזרות ביצעת עכשיו?</label>
+            <div style="display: flex; gap: 8px;">
+              <select id="chalAddSelect" style="flex: 1; font-size: 1rem; padding: 10px;">
+                ${[5, 10, 15, 20, 25, 30, 40, 50, 100].map(n => `<option value="${n}">+ ${n} חזרות</option>`).join('')}
+              </select>
+              <button class="btn" style="background: var(--easy); color: #0f172a;" onclick="addChallengeReps()">➕ הוסף</button>
+            </div>
+          </div>
+          
+          <button class="btn" style="background: transparent; color: var(--danger); border: 1px solid var(--danger); width: 100%; margin-top: 24px;" onclick="resetChallenge()">🗑️ ביטול והחלפת האתגר הנוכחי</button>
+        `;
+      }
+    }
+
+    function startChallenge() {
+      const name = document.getElementById("chalName").value.trim();
+      const target = parseInt(document.getElementById("chalTarget").value);
       
-      if (completionRatio === 0 && !isRestDay) {
-        if (state.gamify.shields > 0) {
-          if (isNewLog) state.gamify.shields -= 1;
-          sessionStatus.overall = "shielded";
-          alert("🛡️ מגן רצף הופעל! שמרת על הרצף שלך למרות הפספוס.");
-        } else {
-          state.gamify.streak = 0;
-          sessionStatus.overall = "missed";
-          alert("⚠️ הרצף התאפס! לא נותרו לך מגני רצף.");
-        }
-      } else {
-        if (isNewLog) {
-          state.gamify.streak += 1;
-          
-          if (state.gamify.streak > 0 && state.gamify.streak % 7 === 0) {
-            if (state.gamify.shields < 3) {
-              state.gamify.shields += 1;
-              alert("🛡️ רצף של 7 ימים! הרווחת מגן רצף חדש.");
-            } else {
-              alert("🔥 רצף של 7 ימים! (מגני הרצף שלך מלאים ב-3/3).");
-            }
-          }
-          
-          let earnedXp = isRestDay ? 30 : Math.round(100 * completionRatio);
-          if (sessionStatus.snack && sessionStatus.snack !== 'missed') {
-             earnedXp += 25; 
-          }
-          if (isCouples) {
-             earnedXp += 50;
-             state.gamify.couplesCount++;
-          }
-          if (complianceMatches > 0) {
-             earnedXp += (complianceMatches * 15);
-          }
-          
-          state.gamify.xp += earnedXp;
-          checkAllBadges();
-
-          if (complianceMatches > 0) {
-              alert(`🎯 עמידה מושלמת ביעד הקושי! קיבלת בונוס +${complianceMatches * 15} XP!`);
-          }
-        }
-        sessionStatus.overall = "completed";
+      if (!name || isNaN(target) || target <= 0) {
+        alert("נא להזין שם תרגיל תקין ויעד הגדול מ-0.");
+        return;
       }
 
-      state.logs[logKey] = { sessionColors, sessionStatus, distance, couples: isCouples, completionRatio, notes, timestamp: new Date().toISOString() };
-      saveState(); init();
+      const key = getChallengeKey();
+      state.challenges[key] = { name, target, progress: 0 };
+      saveState();
+      renderChallenge();
     }
 
-    function checkAllBadges() {
-       const g = state.gamify;
-       
-       if (g.totalSessionsCount >= 1) unlockBadge("log_bronze");
-       if (g.totalSessionsCount >= 10) unlockBadge("log_silver");
-       if (g.totalSessionsCount >= 25) unlockBadge("log_gold");
-       if (g.totalSessionsCount >= 50) unlockBadge("log_plat");
-
-       if (g.snackCount >= 1) unlockBadge("snack_bronze");
-       if (g.snackCount >= 10) unlockBadge("snack_silver");
-       if (g.snackCount >= 25) unlockBadge("snack_gold");
-       if (g.snackCount >= 50) unlockBadge("snack_plat");
-
-       if (g.streak >= 7) unlockBadge("streak_bronze");
-       if (g.streak >= 14) unlockBadge("streak_silver");
-       if (g.streak >= 30) unlockBadge("streak_gold");
-       if (g.streak >= 60) unlockBadge("streak_plat");
-
-       if (g.couplesCount >= 1) unlockBadge("couples_bronze");
-       if (g.couplesCount >= 5) unlockBadge("couples_silver");
-       if (g.couplesCount >= 10) unlockBadge("couples_gold");
-       if (g.couplesCount >= 25) unlockBadge("couples_plat");
-
-       if (g.totalSessionsCount >= 5) {
-           let comp = (g.compliantSessionsCount / g.totalSessionsCount) * 100;
-           if (comp >= 70) unlockBadge("comp_bronze");
-           if (comp >= 80) unlockBadge("comp_silver");
-           if (comp >= 90) unlockBadge("comp_gold");
-           if (comp === 100 && g.totalSessionsCount >= 10) unlockBadge("comp_plat");
-       }
-    }
-
-    function advanceWeekWorkflow() {
-      if (state.currentWeek >= 6) {
-        if (confirm(`האם ברצונך לסיים את מחזור ${state.currentCycle}?`)) {
-          state.currentCycle++; state.currentWeek = 1; state.gamify.xp += 200;
-        }
-      } else {
-        state.currentWeek++;
+    function addChallengeReps() {
+      const key = getChallengeKey();
+      const added = parseInt(document.getElementById("chalAddSelect").value);
+      if (state.challenges[key] && !isNaN(added)) {
+        state.challenges[key].progress += added;
+        saveState();
+        renderChallenge();
       }
-      ensurePlanExists(state.currentCycle, state.currentWeek);
-      saveState(); init(); selectDay("sun");
     }
 
-    function unlockBadge(id) { if (!state.gamify.unlocked.includes(id)) { state.gamify.unlocked.push(id); saveState(); } }
-    
-    function renderAchievements() {
-      document.getElementById("achievementsList").innerHTML = ACHIEVEMENTS_DATA.map(item => `
-        <div class="achievement-card ${state.gamify.unlocked.includes(item.id) ? 'unlocked' : ''}">
-          <div class="icon">${item.icon}</div><span class="title">${item.title}</span><span class="desc">${item.desc}</span>
-        </div>
-      `).join('');
+    function resetChallenge() {
+      if (confirm("האם למחוק את האתגר הנוכחי ולהגדיר אתגר חדש? כל התקדמות האתגר בשבוע זה תאבד.")) {
+        const key = getChallengeKey();
+        delete state.challenges[key];
+        saveState();
+        renderChallenge();
+      }
+    }
+
+    function saveDay() {
+      recalcStats();
+      renderDaySelector();
+      renderBlueprintHUD();
+      alert("האימונים והנתונים נשמרו בהצלחה!");
+    }
+
+    function saveBlueprintTargets() {
+      state.blueprint.aerobic = parseInt(document.getElementById("bpAeroTarget").value) || 0;
+      state.blueprint.resistance = parseInt(document.getElementById("bpResTarget").value) || 0;
+      state.blueprint.snack = parseInt(document.getElementById("bpSnackTarget").value) || 0;
+      saveState(); renderBlueprintHUD(); alert("תוכנית הבסיס עודכנה.");
+    }
+
+    function recalcStats() {
+      stats = { workouts: 0, distance: 0, time: 0, couples: 0 };
+      Object.values(state.logs).forEach(log => {
+        if(log.couples) stats.couples++;
+        ['aerobic', 'resistance', 'snack'].forEach(type => {
+          if(log[type]) {
+            stats.workouts += log[type].length;
+            log[type].forEach(b => {
+              if(b.time) stats.time += b.time;
+              if(b.distance) stats.distance += b.distance;
+            });
+          }
+        });
+      });
+    }
+
+    function renderTrophyRoom() {
+      recalcStats();
+      document.getElementById("statWorkouts").innerText = stats.workouts;
+      document.getElementById("statDistance").innerText = stats.distance.toFixed(1);
+      document.getElementById("statTime").innerText = (stats.time / 60).toFixed(1);
+      document.getElementById("statCouples").innerText = stats.couples;
+
+      const container = document.getElementById("badgeContainer");
+      container.innerHTML = BADGES.map(b => {
+        let val = b.type === 'time' ? stats.time : stats[b.type];
+        let unlocked = val >= b.thresh;
+        return `
+          <div class="badge-card tier-${b.tier} ${unlocked ? 'unlocked' : ''}">
+            <div class="badge-icon">${b.icon}</div>
+            <span class="badge-title">${b.title}</span>
+            <span class="badge-desc">${b.desc}</span>
+          </div>
+        `;
+      }).join('');
     }
 
     function saveState() {
-      localStorage.setItem("health_tracker_logs", JSON.stringify(state.logs));
-      localStorage.setItem("health_tracker_gamify", JSON.stringify(state.gamify));
-      localStorage.setItem("health_tracker_generated_plans", JSON.stringify(state.generatedPlans));
-      localStorage.setItem("health_tracker_meta", JSON.stringify({ cycle: state.currentCycle, week: state.currentWeek, activeWeeks: state.activeWeeksInCycle }));
+      localStorage.setItem("health_v2_state", JSON.stringify(state));
     }
 
-    window.populateCategoryDropdown = function(type, selectedCategory = "") {
-      const select = document.getElementById("modalCategorySelect");
-      select.innerHTML = "";
-      const catalog = appData.exercise_catalog || {};
-      const categories = new Set();
-      Object.values(catalog).forEach(ex => { 
-          if (ex.type === type || (type === 'snack' && (ex.type === 'resistance' || ex.type === 'aerobic'))) {
-              categories.add(ex.category); 
-          }
-      });
-      Array.from(categories).sort().forEach(cat => {
-        const opt = document.createElement("option");
-        opt.value = cat; 
-        
-        let catHebrew = cat.replace("_", " ").toUpperCase();
-        if(cat === "lower_body") catHebrew = "פלג גוף תחתון";
-        if(cat === "upper_body") catHebrew = "פלג גוף עליון";
-        if(cat === "power") catHebrew = "כוח מתפרץ";
-        if(cat === "core") catHebrew = "ליבה";
-        if(cat === "strength") catHebrew = "כוח";
-        if(cat === "walk") catHebrew = "הליכה";
-        if(cat === "run") catHebrew = "ריצה";
-        if(cat === "cardio") catHebrew = "אירובי";
-        
-        opt.innerText = catHebrew;
-        if (cat === selectedCategory) opt.selected = true;
-        select.appendChild(opt);
-      });
-      populateGroupedDropdown(); 
-    }
-
-    window.populateGroupedDropdown = function(selectedId = "") {
-      const type = document.getElementById("modalType").value;
-      const category = document.getElementById("modalCategorySelect").value;
-      const select = document.getElementById("modalExerciseSelect");
-      select.innerHTML = `<option value="" disabled ${!selectedId ? 'selected' : ''}>-- בחר תרגיל --</option>`;
-      const catalog = appData.exercise_catalog || {};
-      Object.entries(catalog).forEach(([id, ex]) => {
-        let isTypeMatch = (ex.type === type) || (type === 'snack' && (ex.type === 'resistance' || ex.type === 'aerobic'));
-        if (isTypeMatch && ex.category === category) {
-          const opt = document.createElement("option");
-          opt.value = id; opt.innerText = ex.name;
-          if (id === selectedId) opt.selected = true;
-          select.appendChild(opt);
-        }
-      });
-    }
-
-    window.togglePrescriptionFields = function() {
-      const t = document.getElementById("modalPrescriptionType").value;
-      document.querySelectorAll(".p-field").forEach(el => el.style.display = 'none');
-      document.getElementById(`field_${t}`).style.display = t === 'duration' ? 'flex' : 'grid';
-    }
-
-    function openAddExerciseModal(type) {
-      document.getElementById("modalType").value = type;
-      document.getElementById("modalEditIndex").value = "-1";
-      document.getElementById("modalTitle").innerText = `הוספת תרגיל חדש`;
-      
-      document.getElementById("modalPrescriptionType").value = "reps";
-      document.getElementById("modalRepSets").value = "";
-      document.getElementById("modalRepCount").value = "";
-      document.getElementById("modalRepRest").value = "";
-      document.getElementById("modalMin").value = "";
-      document.getElementById("modalIntSets").value = "";
-      document.getElementById("modalEffort").value = "Moderate";
-      
-      populateCategoryDropdown(type);
-      togglePrescriptionFields();
-      document.getElementById("exerciseModal").style.display = "flex";
-    }
-    
-    function openEditExerciseModal(type, index) {
-      const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
-      const item = state.generatedPlans[planKey].days[state.currentDay][type][index];
-      
-      document.getElementById("modalType").value = type;
-      document.getElementById("modalEditIndex").value = index;
-      document.getElementById("modalTitle").innerText = `עריכת תרגיל`;
-      document.getElementById("modalEffort").value = item.effort || "Moderate";
-      
-      populateCategoryDropdown(type, item.category);
-      populateGroupedDropdown(item.exerciseId);
-
-      const p = item.prescription || {type: 'reps'};
-      document.getElementById("modalPrescriptionType").value = p.type || 'reps';
-      
-      if (p.type === 'duration') { document.getElementById("modalMin").value = p.minutes || ""; }
-      else if (p.type === 'intervals') {
-        document.getElementById("modalIntSets").value = p.sets || "";
-        document.getElementById("modalIntWork").value = p.work_sec || "";
-        document.getElementById("modalIntRest").value = p.rest_sec || "";
-      }
-      else {
-        document.getElementById("modalRepSets").value = p.sets || "";
-        document.getElementById("modalRepCount").value = p.reps || "";
-        document.getElementById("modalRepRest").value = p.rest_sec || "";
-      }
-
-      togglePrescriptionFields();
-      document.getElementById("exerciseModal").style.display = "flex";
-    }
-    
-    function closeModal() { document.getElementById("exerciseModal").style.display = "none"; }
-    
-    function saveModalExercise(e) {
-      e.preventDefault();
-      const type = document.getElementById("modalType").value;
-      const index = parseInt(document.getElementById("modalEditIndex").value);
-      const category = document.getElementById("modalCategorySelect").value;
-      const exerciseId = document.getElementById("modalExerciseSelect").value;
-      const pType = document.getElementById("modalPrescriptionType").value;
-      const effort = document.getElementById("modalEffort").value;
-
-      let prescription = { type: pType };
-      if (pType === 'duration') { prescription.minutes = parseInt(document.getElementById("modalMin").value) || 0; }
-      else if (pType === 'intervals') {
-        prescription.sets = parseInt(document.getElementById("modalIntSets").value) || 0;
-        prescription.work_sec = parseInt(document.getElementById("modalIntWork").value) || 0;
-        prescription.rest_sec = parseInt(document.getElementById("modalIntRest").value) || 0;
-      }
-      else {
-        prescription.sets = parseInt(document.getElementById("modalRepSets").value) || 0;
-        prescription.reps = parseInt(document.getElementById("modalRepCount").value) || 0;
-        prescription.rest_sec = parseInt(document.getElementById("modalRepRest").value) || 0;
-      }
-
-      const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
-      const arr = state.generatedPlans[planKey].days[state.currentDay][type];
-      
-      if (index === -1) arr.push({ category, exerciseId, prescription, effort });
-      else arr[index] = { category, exerciseId, prescription, effort };
-      
-      saveState(); closeModal(); renderDayView();
-    }
-    
-    function deleteExercise(type, index) {
-      const planKey = `c${state.currentCycle}_w${state.currentWeek}`;
-      state.generatedPlans[planKey].days[state.currentDay][type].splice(index, 1);
-      saveState(); renderDayView();
-    }
-    
-    function loadDataFromClipboard() {
-      try { 
-        appData = JSON.parse(document.getElementById("jsonArea").value); 
-        localStorage.setItem("health_tracker_app_data", JSON.stringify(appData));
-        init(); 
-        alert("הקטלוג נטען בהצלחה מתוך תיבת הטקסט!"); 
-      } catch(e) { alert("פורמט JSON לא חוקי. אנא בדוק את הקוד."); }
-    }
-
+    /* Drive Sync Protocol */
     const SCOPES = 'https://www.googleapis.com/auth/drive.file';
     let tokenClient;
     let pendingAction = null;
-    let pendingTarget = null;
 
     function saveClientId() {
       const id = document.getElementById("gcpClientId").value.trim();
-      if(id) { localStorage.setItem("health_gdrive_client_id", id); alert("מזהה (Client ID) נשמר בהצלחה."); }
+      if(id) { localStorage.setItem("gdrive_client_id", id); alert("מזהה נשמר."); }
     }
 
-    function updateSyncStatus(msg, isError=false) {
+    function updateSyncStatus(msg, isErr=false) {
       const el = document.getElementById("syncStatus");
-      el.innerText = msg; el.style.color = isError ? "var(--danger)" : "var(--success)";
+      el.innerText = msg; el.style.color = isErr ? "var(--danger)" : "var(--easy)";
     }
 
-    function authenticateDrive(action, target) {
-      const clientId = localStorage.getItem("health_gdrive_client_id");
-      if (!clientId) return updateSyncStatus("אנא הזן Client ID לפני הסנכרון.", true);
-      updateSyncStatus(`מבצע אימות מול גוגל עבור ${target}...`);
+    function authenticateDrive(action) {
+      const clientId = localStorage.getItem("gdrive_client_id");
+      if (!clientId) return updateSyncStatus("אנא הזיני מזהה לקוח קודם.", true);
+      updateSyncStatus("מבצע אימות מול גוגל...");
       pendingAction = action;
-      pendingTarget = target;
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: clientId, scope: SCOPES,
         callback: (response) => {
           if (response.error) updateSyncStatus("אימות נכשל.", true);
           else {
-              if (pendingAction === 'push') executePush(response.access_token, pendingTarget);
-              else if (pendingAction === 'pull') executePull(response.access_token, pendingTarget);
+              if (pendingAction === 'push') executePush(response.access_token);
+              else if (pendingAction === 'pull') executePull(response.access_token);
           }
         }
       });
       tokenClient.requestAccessToken();
     }
 
-    async function executePush(token, target) {
-      const fileName = target === 'catalog' ? 'health_tracker_catalog.json' : 'health_tracker_state.json';
-      updateSyncStatus(`מעלה את ${target} לדרייב...`);
+    async function executePush(token) {
+      updateSyncStatus("מעלה נתונים לדרייב...");
       try {
-        const query = encodeURIComponent(`name='${fileName}' and trashed=false`);
+        const query = encodeURIComponent(`name='health_tracker_v2_data.json' and trashed=false`);
         const listRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id)`, { headers: { Authorization: `Bearer ${token}` }});
         const listData = await listRes.json();
         
-        const buildPayload = () => {
-            if (target === 'catalog') return JSON.stringify({ appData });
-            return JSON.stringify({ state, metaState });
-        };
+        const payload = JSON.stringify(state);
 
         if (!listData.files || listData.files.length === 0) {
-          const metadata = { name: fileName, mimeType: 'application/json' };
+          const metadata = { name: 'health_tracker_v2_data.json', mimeType: 'application/json' };
           const form = new FormData();
           form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-          form.append('file', new Blob([buildPayload()], { type: 'application/json' }));
+          form.append('file', new Blob([payload], { type: 'application/json' }));
           
           await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: form });
         } else {
           const fileId = listData.files[0].id;
-          await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: buildPayload() });
+          await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: payload });
         }
         updateSyncStatus(`✓ נשמר לדרייב בהצלחה (${new Date().toLocaleTimeString()})`);
-      } catch (err) { updateSyncStatus(`Upload Error: ${err.message}`, true); }
+      } catch (err) { updateSyncStatus(`שגיאת העלאה: ${err.message}`, true); }
     }
 
-    async function executePull(token, target) {
-      const fileName = target === 'catalog' ? 'health_tracker_catalog.json' : 'health_tracker_state.json';
-      updateSyncStatus(`מוריד את ${target} מהדרייב...`);
+    async function executePull(token) {
+      updateSyncStatus("מוריד נתונים מהדרייב...");
       try {
-        const query = encodeURIComponent(`name='${fileName}' and trashed=false`);
+        const query = encodeURIComponent(`name='health_tracker_v2_data.json' and trashed=false`);
         const listRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id)`, { headers: { Authorization: `Bearer ${token}` }});
         const listData = await listRes.json();
 
         if (!listData.files || listData.files.length === 0) {
-            return updateSyncStatus(`לא נמצא קובץ בדרייב. יש לבצע שמירה לדרייב קודם.`, true);
+            return updateSyncStatus("לא נמצא קובץ בדרייב. יש לגבות קודם.", true);
         }
 
         const fileId = listData.files[0].id;
         const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, { headers: { Authorization: `Bearer ${token}` }});
         const data = await res.json();
         
-        if (target === 'catalog') {
-            if(data.appData) appData = data.appData;
-            localStorage.setItem("health_tracker_app_data", JSON.stringify(appData));
-        } else {
-            if(data.state) {
-                state.logs = data.state.logs || {};
-                state.gamify = data.state.gamify || { xp: 0, streak: 0, couplesCount: 0, shields: 2, unlocked: [], totalSessionsCount: 0, compliantSessionsCount: 0, snackCount: 0 };
-                state.generatedPlans = data.state.generatedPlans || {};
-                state.currentCycle = data.state.currentCycle;
-                state.currentWeek = data.state.currentWeek;
-                state.activeWeeksInCycle = data.state.activeWeeksInCycle;
-            }
-            if(data.metaState) {
-                metaState = data.metaState;
-            }
+        if(data && data.meta && data.blueprint) {
+            state = data;
+            if (!state.challenges) state.challenges = {}; // Safety check post-pull
             saveState();
+            init();
+            updateSyncStatus(`✓ הנתונים שוחזרו בהצלחה (${new Date().toLocaleTimeString()})`);
+        } else {
+            updateSyncStatus("הקובץ אינו תקין.", true);
         }
-
-        init();
-        updateSyncStatus(`✓ נטען מהדרייב בהצלחה (${new Date().toLocaleTimeString()})`);
-      } catch (err) { updateSyncStatus(`Download Error: ${err.message}`, true); }
+      } catch (err) { updateSyncStatus(`שגיאת הורדה: ${err.message}`, true); }
     }
 
     window.onload = init;
